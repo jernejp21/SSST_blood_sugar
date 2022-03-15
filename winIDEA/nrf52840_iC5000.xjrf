@@ -352,7 +352,7 @@
          <Condition></Condition>
          <Condition_Count>0</Condition_Count>
          <ConditionEnabled>False</ConditionEnabled>
-         <Name>&quot;..\Firmware\src\main.c&quot;::31</Name>
+         <Name>&quot;..\Firmware\src\main.c&quot;::176</Name>
         </__>
        </BP.0>
       </Fetch>
@@ -453,7 +453,7 @@
         <DisplayCollapsedArrayStruct>true</DisplayCollapsedArrayStruct>
         <DisplayPointerMemArea>false</DisplayPointerMemArea>
         <EnumDisplay>Enum</EnumDisplay>
-        <Hex>true</Hex>
+        <Hex>false</Hex>
         <MaxParseUpload>256</MaxParseUpload>
         <QualifiedNames>Unique</QualifiedNames>
         <UseSpacers>false</UseSpacers>
@@ -574,7 +574,7 @@
           <Count>0</Count>
           <Enabled>true</Enabled>
           <Expression></Expression>
-          <Location>&quot;..\Firmware\src\main.c&quot;::31</Location>
+          <Location>&quot;..\Firmware\src\main.c&quot;::176</Location>
           <ProcessFilter></ProcessFilter>
          </__.0>
         </BPs>
@@ -2314,7 +2314,7 @@
         <IRPostfix>0</IRPostfix>
         <IRPrefix>0</IRPrefix>
         <PostResetDelay_ms>100</PostResetDelay_ms>
-        <Protocol>0</Protocol>
+        <Protocol>1</Protocol>
         <ResetDuration_ms>100</ResetDuration_ms>
         <SingleComponentAddress>0</SingleComponentAddress>
         <SpecificJTAGTAPOnly>0</SpecificJTAGTAPOnly>
@@ -2542,9 +2542,9 @@
         <OCD_ARM>
          <CortexDebugProtocol>SWD</CortexDebugProtocol>
          <CortexSWDClock>6000</CortexSWDClock>
-         <CortexSwoClkPrescaler>0</CortexSwoClkPrescaler>
-         <CortexSWOClock>0</CortexSWOClock>
-         <CortexTraceProtocol>Parallel</CortexTraceProtocol>
+         <CortexSwoClkPrescaler>1</CortexSwoClkPrescaler>
+         <CortexSWOClock>32000</CortexSWOClock>
+         <CortexTraceProtocol>SWO</CortexTraceProtocol>
          <CortexTRACEWidth>4-bit</CortexTRACEWidth>
          <UseCTMCh0and1ForSyncedRunStop>false</UseCTMCh0and1ForSyncedRunStop>
          <UseCTMCh2and3ForTrace>false</UseCTMCh2and3ForTrace>

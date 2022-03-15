@@ -13,52 +13,76 @@
        <EditorPersist>
         <__.0>
          <BookmarkList></BookmarkList>
+         <CaretPos>2977</CaretPos>
+         <Encoding>1</Encoding>
+         <FileName>Z:\home\jernej\nRF_SDK\ncs\zephyr\include\sys\time_units.h</FileName>
+         <FileType>1</FileType>
+         <ScrollPos>47</ScrollPos>
+        </__.0>
+        <__.1>
+         <BookmarkList></BookmarkList>
          <CaretPos>1062</CaretPos>
          <Encoding>1</Encoding>
          <FileName>D:\Projects\SSST_blood_sugar\Firmware\src\main.c</FileName>
          <FileType>1</FileType>
          <ScrollPos>15</ScrollPos>
-        </__.0>
-        <__.1>
+        </__.1>
+        <__.2>
          <BookmarkList></BookmarkList>
          <CaretPos>2488</CaretPos>
          <Encoding>1</Encoding>
          <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\cpu_idle.S</FileName>
          <FileType>0</FileType>
          <ScrollPos>68</ScrollPos>
-        </__.1>
-        <__.2>
+        </__.2>
+        <__.3>
          <BookmarkList></BookmarkList>
          <CaretPos>8153</CaretPos>
          <Encoding>1</Encoding>
          <FileName>D:\Projects\SSST_blood_sugar\Firmware\build\zephyr\include\generated\syscalls\gpio.h</FileName>
          <FileType>1</FileType>
          <ScrollPos>190</ScrollPos>
-        </__.2>
-        <__.3>
+        </__.3>
+        <__.4>
+         <BookmarkList></BookmarkList>
+         <CaretPos>2012</CaretPos>
+         <Encoding>1</Encoding>
+         <FileName>Z:\home\jernej\nRF_SDK\ncs\zephyr\arch\arm\core\aarch32\cortex_m\reset.S</FileName>
+         <FileType>0</FileType>
+         <ScrollPos>26</ScrollPos>
+        </__.4>
+        <__.5>
          <BookmarkList></BookmarkList>
          <CaretPos>936</CaretPos>
          <Encoding>1</Encoding>
          <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\lib\os\thread_entry.c</FileName>
          <FileType>1</FileType>
          <ScrollPos>0</ScrollPos>
-        </__.3>
-        <__.4>
+        </__.5>
+        <__.6>
          <BookmarkList></BookmarkList>
          <CaretPos>18816</CaretPos>
          <Encoding>1</Encoding>
          <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\thread.c</FileName>
          <FileType>1</FileType>
          <ScrollPos>490</ScrollPos>
-        </__.4>
-        <__.5>
+        </__.6>
+        <__.7>
          <BookmarkList></BookmarkList>
          <CaretPos>2080</CaretPos>
          <Encoding>1</Encoding>
          <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\cortex_m\reset.S</FileName>
          <FileType>0</FileType>
          <ScrollPos>31</ScrollPos>
-        </__.5>
+        </__.7>
+        <__.8>
+         <BookmarkList></BookmarkList>
+         <CaretPos>2008</CaretPos>
+         <Encoding>1</Encoding>
+         <FileName>Z:\home\jernej\Projects\SSST_blood_sugar\Firmware\src\main.c</FileName>
+         <FileType>1</FileType>
+         <ScrollPos>81</ScrollPos>
+        </__.8>
        </EditorPersist>
       </EditorPersist>
      </REG_ROOT>
@@ -73,6 +97,379 @@
      </REG_HEADER>
      <REG_ROOT>
       <RegVer>1296220160</RegVer>
+      <ANGUIData.0>
+       <Filetime type="B">FOMOCPLGBEDINIAB</Filetime>
+       <GUID type="B">BPEJLJIBMCODFOEBIBPPDKDJPDGLECMK</GUID>
+       <CVData>
+        <Columns>
+         <SortBy>0</SortBy>
+         <SortSmallLast>false</SortSmallLast>
+         <Columns>
+          <__.0>
+           <Pos>0</Pos>
+           <Visible>true</Visible>
+           <Width>300</Width>
+          </__.0>
+          <__.1>
+           <Pos>0</Pos>
+           <Visible>true</Visible>
+           <Width>200</Width>
+          </__.1>
+          <__.2>
+           <Pos>0</Pos>
+           <Visible>true</Visible>
+           <Width>200</Width>
+          </__.2>
+          <__.3>
+           <Pos>0</Pos>
+           <Visible>true</Visible>
+           <Width>200</Width>
+          </__.3>
+          <__.4>
+           <Pos>0</Pos>
+           <Visible>true</Visible>
+           <Width>150</Width>
+          </__.4>
+          <__.5>
+           <Pos>0</Pos>
+           <Visible>true</Visible>
+           <Width>200</Width>
+          </__.5>
+          <__.6>
+           <Pos>0</Pos>
+           <Visible>true</Visible>
+           <Width>100</Width>
+          </__.6>
+         </Columns>
+         <Sort>
+          <Column>0</Column>
+          <Direction>Ascending</Direction>
+         </Sort>
+        </Columns>
+        <Search>
+         <MatchCase>false</MatchCase>
+         <Text></Text>
+         <Up>false</Up>
+        </Search>
+       </CVData>
+       <ProfilerData>
+        <InitialLayoutProcessed>true</InitialLayoutProcessed>
+        <Docking>
+         <PrimaryDocumentPaneId>-1</PrimaryDocumentPaneId>
+         <Frames>
+          <__.0>
+           <FocusedViewId>4</FocusedViewId>
+           <FrameState>9</FrameState>
+           <IsPrimary>true</IsPrimary>
+           <Bounds>
+            <Bottom>1108</Bottom>
+            <Left>0</Left>
+            <Right>1916</Right>
+            <Top>0</Top>
+           </Bounds>
+           <Dock>
+            <DockType>None</DockType>
+            <Extent>1</Extent>
+            <IsDocumentPane>false</IsDocumentPane>
+            <IsPinned>false</IsPinned>
+            <IsTabbed>false</IsTabbed>
+            <Orientation>Vertical</Orientation>
+            <TopTabViewId>-1</TopTabViewId>
+            <ViewId>-1</ViewId>
+            <Children>
+             <__.0>
+              <DockType>View</DockType>
+              <Extent>0.5</Extent>
+              <IsDocumentPane>false</IsDocumentPane>
+              <IsPinned>false</IsPinned>
+              <IsTabbed>false</IsTabbed>
+              <Orientation>Vertical</Orientation>
+              <TopTabViewId>-1</TopTabViewId>
+              <ViewId>0</ViewId>
+             </__.0>
+             <__.1>
+              <DockType>View</DockType>
+              <Extent>0.5</Extent>
+              <IsDocumentPane>false</IsDocumentPane>
+              <IsPinned>false</IsPinned>
+              <IsTabbed>false</IsTabbed>
+              <Orientation>Horizontal</Orientation>
+              <TopTabViewId>-1</TopTabViewId>
+              <ViewId>4</ViewId>
+             </__.1>
+            </Children>
+           </Dock>
+          </__.0>
+         </Frames>
+        </Docking>
+        <PRSettings>
+         <DisplayDownloadFile>false</DisplayDownloadFile>
+         <DisplayInspectorGroup>false</DisplayInspectorGroup>
+         <MaxNumberOfStates>128</MaxNumberOfStates>
+         <SynchronizeAllProfilerViewsFilters>false</SynchronizeAllProfilerViewsFilters>
+         <SynchronizeProfilerViews>true</SynchronizeProfilerViews>
+         <UseProcessNameAsRoot>false</UseProcessNameAsRoot>
+        </PRSettings>
+        <StatisticsViews>
+         <__.0>
+          <AreaName></AreaName>
+          <AreaStatType>Cumulative</AreaStatType>
+          <FitChart>false</FitChart>
+          <FromTime>0</FromTime>
+          <FullName></FullName>
+          <ToTime>0</ToTime>
+          <ViewData>
+           <CurrentApplicationIndex>0</CurrentApplicationIndex>
+           <CurrentContextIndex>65535</CurrentContextIndex>
+           <HideAreasWithNoActivity>false</HideAreasWithNoActivity>
+           <ViewTitle>Profiler Statistic</ViewTitle>
+           <Pane>
+            <Areas.areaAux>
+             <Height>0</Height>
+             <Filter>
+              <ShowChildItems>false</ShowChildItems>
+              <Text></Text>
+              <Visible>false</Visible>
+             </Filter>
+             <Sort>
+              <Column>0</Column>
+              <Direction>Ascending</Direction>
+             </Sort>
+            </Areas.areaAux>
+            <Areas.areaCode>
+             <Height>0</Height>
+             <Filter>
+              <ShowChildItems>false</ShowChildItems>
+              <Text></Text>
+              <Visible>false</Visible>
+             </Filter>
+             <Sort>
+              <Column>0</Column>
+              <Direction>Ascending</Direction>
+             </Sort>
+            </Areas.areaCode>
+            <Areas.areaData>
+             <Height>100</Height>
+             <Filter>
+              <ShowChildItems>false</ShowChildItems>
+              <Text></Text>
+              <Visible>false</Visible>
+             </Filter>
+             <Sort>
+              <Column>0</Column>
+              <Direction>Ascending</Direction>
+             </Sort>
+            </Areas.areaData>
+            <ColumnWidths>
+             <__.0>
+              <Pos>0</Pos>
+              <Visible>true</Visible>
+              <Width>120</Width>
+             </__.0>
+             <__.1>
+              <Pos>0</Pos>
+              <Visible>true</Visible>
+              <Width>120</Width>
+             </__.1>
+             <__.10>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.10>
+             <__.11>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.11>
+             <__.12>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.12>
+             <__.13>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.13>
+             <__.14>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.14>
+             <__.15>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.15>
+             <__.16>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.16>
+             <__.17>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.17>
+             <__.18>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.18>
+             <__.19>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.19>
+             <__.2>
+              <Pos>0</Pos>
+              <Visible>true</Visible>
+              <Width>120</Width>
+             </__.2>
+             <__.20>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.20>
+             <__.21>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.21>
+             <__.22>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.22>
+             <__.23>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.23>
+             <__.3>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.3>
+             <__.4>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.4>
+             <__.5>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.5>
+             <__.6>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.6>
+             <__.7>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.7>
+             <__.8>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.8>
+             <__.9>
+              <Pos>0</Pos>
+              <Visible>false</Visible>
+              <Width>120</Width>
+             </__.9>
+            </ColumnWidths>
+           </Pane>
+          </ViewData>
+         </__.0>
+        </StatisticsViews>
+        <TimelineViews>
+         <__.0>
+          <ScrollPosition>50923972</ScrollPosition>
+          <SnapOnFindEvent>true</SnapOnFindEvent>
+          <TimeLeft>50923972</TimeLeft>
+          <TimeRight>7669112854</TimeRight>
+          <ZoomLevel>4479622</ZoomLevel>
+          <ViewData>
+           <CurrentApplicationIndex>0</CurrentApplicationIndex>
+           <CurrentContextIndex>65535</CurrentContextIndex>
+           <HideAreasWithNoActivity>true</HideAreasWithNoActivity>
+           <ViewTitle>Profiler Timeline</ViewTitle>
+           <Pane>
+            <Areas.areaAux>
+             <Height>0</Height>
+             <Filter>
+              <ShowChildItems>false</ShowChildItems>
+              <Text></Text>
+              <Visible>false</Visible>
+             </Filter>
+             <Sort>
+              <Column>0</Column>
+              <Direction>Ascending</Direction>
+             </Sort>
+            </Areas.areaAux>
+            <Areas.areaCode>
+             <Height>0</Height>
+             <Filter>
+              <ShowChildItems>false</ShowChildItems>
+              <Text></Text>
+              <Visible>false</Visible>
+             </Filter>
+             <Sort>
+              <Column>0</Column>
+              <Direction>Ascending</Direction>
+             </Sort>
+            </Areas.areaCode>
+            <Areas.areaData>
+             <Height>100</Height>
+             <Filter>
+              <ShowChildItems>false</ShowChildItems>
+              <Text></Text>
+              <Visible>false</Visible>
+             </Filter>
+             <Sort>
+              <Column>0</Column>
+              <Direction>Ascending</Direction>
+             </Sort>
+            </Areas.areaData>
+            <ColumnWidths>
+             <__.0>
+              <Pos>0</Pos>
+              <Visible>true</Visible>
+              <Width>150</Width>
+             </__.0>
+             <__.1>
+              <Pos>0</Pos>
+              <Visible>true</Visible>
+              <Width>50</Width>
+             </__.1>
+             <__.2>
+              <Pos>0</Pos>
+              <Visible>true</Visible>
+              <Width>800</Width>
+             </__.2>
+            </ColumnWidths>
+           </Pane>
+          </ViewData>
+         </__.0>
+        </TimelineViews>
+        <ViewData>
+         <__.0>
+          <DataIndex>0</DataIndex>
+          <ViewId>0</ViewId>
+          <ViewType>Timeline</ViewType>
+         </__.0>
+         <__.1>
+          <DataIndex>0</DataIndex>
+          <ViewId>4</ViewId>
+          <ViewType>GlobalStatistics</ViewType>
+         </__.1>
+        </ViewData>
+       </ProfilerData>
+      </ANGUIData.0>
      </REG_ROOT>
     </LAOptions>
    </LA>
@@ -89,16 +486,16 @@
      <FileHistory>
       <FileHistoryEntries>
        <__.0>
-        <RelativeFilePath>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\cpu_idle.S</RelativeFilePath>
+        <RelativeFilePath>..\Firmware\build\zephyr\include\generated\syscalls\gpio.h</RelativeFilePath>
        </__.0>
        <__.1>
-        <RelativeFilePath>..\Firmware\build\zephyr\include\generated\syscalls\gpio.h</RelativeFilePath>
+        <RelativeFilePath>C:\Users\jernej\ncs\v1.9.0\zephyr\lib\os\thread_entry.c</RelativeFilePath>
        </__.1>
        <__.2>
-        <RelativeFilePath>C:\Users\jernej\ncs\v1.9.0\zephyr\lib\os\thread_entry.c</RelativeFilePath>
+        <RelativeFilePath>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\thread.c</RelativeFilePath>
        </__.2>
        <__.3>
-        <RelativeFilePath>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\thread.c</RelativeFilePath>
+        <RelativeFilePath>nrf52840_iC5000.trd</RelativeFilePath>
        </__.3>
       </FileHistoryEntries>
      </FileHistory>
@@ -138,21 +535,29 @@
         <ViewType>CustomWatch</ViewType>
        </__.3>
        <__.4>
-        <ViewId>2</ViewId>
-        <ViewType>Output_Progress</ViewType>
-       </__.4>
-       <__.5>
-        <ViewId>1</ViewId>
-        <ViewType>Symbols</ViewType>
-       </__.5>
-       <__.6>
-        <ViewId>7</ViewId>
-        <ViewType>Document</ViewType>
-       </__.6>
-       <__.7>
         <ViewId>8</ViewId>
         <ViewType>Document</ViewType>
+       </__.4>
+       <__.5>
+        <ViewId>10</ViewId>
+        <ViewType>Document</ViewType>
+       </__.5>
+       <__.6>
+        <ViewId>2</ViewId>
+        <ViewType>Output_Progress</ViewType>
+       </__.6>
+       <__.7>
+        <ViewId>1</ViewId>
+        <ViewType>Symbols</ViewType>
        </__.7>
+       <__.8>
+        <ViewId>11</ViewId>
+        <ViewType>Document</ViewType>
+       </__.8>
+       <__.9>
+        <ViewId>12</ViewId>
+        <ViewType>SFR</ViewType>
+       </__.9>
       </AllViewBaseData>
       <DissasemblyViews>
        <__.0>
@@ -179,25 +584,26 @@
       </DissasemblyViews>
       <DocumentViews>
        <__.0>
-        <RelativePath>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\cortex_m\reset.S</RelativePath>
-        <ViewId>7</ViewId>
-        <ViewType>Document</ViewType>
-       </__.0>
-       <__.1>
         <RelativePath>..\Firmware\src\main.c</RelativePath>
         <ViewId>8</ViewId>
         <ViewType>Document</ViewType>
+       </__.0>
+       <__.1>
+        <RelativePath>..\..\..\nRF_SDK\ncs\zephyr\arch\arm\core\aarch32\cortex_m\reset.S</RelativePath>
+        <ViewId>10</ViewId>
+        <ViewType>Document</ViewType>
        </__.1>
+       <__.2>
+        <RelativePath>..\..\..\nRF_SDK\ncs\zephyr\include\sys\time_units.h</RelativePath>
+        <ViewId>11</ViewId>
+        <ViewType>Document</ViewType>
+       </__.2>
       </DocumentViews>
       <OtherViews>
        <__.0>
         <ViewId>1</ViewId>
         <ViewType>Symbols</ViewType>
        </__.0>
-       <__.1>
-        <ViewId>-1</ViewId>
-        <ViewType>Callstack</ViewType>
-       </__.1>
       </OtherViews>
       <OutputViews>
        <__.0>
@@ -229,6 +635,100 @@
         </TreeState>
        </__.0>
       </ProjectViews>
+      <SfrViews>
+       <__.0>
+        <CustomSfrName></CustomSfrName>
+        <IsCustomSfr>false</IsCustomSfr>
+        <RealTimeUpdate>false</RealTimeUpdate>
+        <ViewId>12</ViewId>
+        <ViewType>SFR</ViewType>
+        <ColumnData>
+         <__.0>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>200</Width>
+         </__.0>
+         <__.1>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>100</Width>
+         </__.1>
+         <__.2>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>400</Width>
+         </__.2>
+         <__.3>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>100</Width>
+         </__.3>
+         <__.4>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>400</Width>
+         </__.4>
+        </ColumnData>
+        <TreeState>
+         <ReorderItems>false</ReorderItems>
+         <SelectedItems>TRACECONFIG</SelectedItems>
+         <RootItem>
+          <Name></Name>
+          <Options>0</Options>
+          <ChildItems>
+           <__.0>
+            <Name>Cortex-M4,nRF52840-xxAA</Name>
+            <Options>5</Options>
+            <ChildItems>
+             <__.0>
+              <Name>General Purpose Registers</Name>
+              <Options>4</Options>
+             </__.0>
+             <__.1>
+              <Name>CLOCK</Name>
+              <Options>1</Options>
+              <ChildItems>
+               <__.0>
+                <Name>TASKS_HFCLKSTART</Name>
+                <Options>4</Options>
+               </__.0>
+               <__.1>
+                <Name>TRACECONFIG</Name>
+                <Options>1</Options>
+                <ChildItems>
+                 <__.0>
+                  <Name>TRACEPORTSPEED</Name>
+                  <Options>4</Options>
+                 </__.0>
+                </ChildItems>
+               </__.1>
+              </ChildItems>
+             </__.1>
+            </ChildItems>
+           </__.0>
+          </ChildItems>
+         </RootItem>
+         <SelectedItemPaths>
+          <__.0>
+           <Segments>
+            <__.0>
+             <Name></Name>
+            </__.0>
+            <__.1>
+             <Name>Cortex-M4,nRF52840-xxAA</Name>
+            </__.1>
+            <__.2>
+             <Name>CLOCK</Name>
+            </__.2>
+            <__.3>
+             <Name>TRACECONFIG</Name>
+            </__.3>
+           </Segments>
+          </__.0>
+         </SelectedItemPaths>
+        </TreeState>
+       </__.0>
+      </SfrViews>
       <VariableViews>
        <__.0>
         <ViewId>3</ViewId>
@@ -262,6 +762,44 @@
          </PaneMiscData.3>
          <VariableData>
           <IsRealTimeEnabled>false</IsRealTimeEnabled>
+          <Variables>
+           <__.0>
+            <Name>profiler1</Name>
+            <ExpressionDisplay>
+             <Color>false</Color>
+             <ColorBack>16777215</ColorBack>
+             <ColorText>0</ColorText>
+             <Enabled>false</Enabled>
+             <Hi>0</Hi>
+             <Lo>0</Lo>
+             <Scale>Linear</Scale>
+            </ExpressionDisplay>
+           </__.0>
+           <__.1>
+            <Name>profiler2</Name>
+            <ExpressionDisplay>
+             <Color>false</Color>
+             <ColorBack>16777215</ColorBack>
+             <ColorText>0</ColorText>
+             <Enabled>false</Enabled>
+             <Hi>0</Hi>
+             <Lo>0</Lo>
+             <Scale>Linear</Scale>
+            </ExpressionDisplay>
+           </__.1>
+           <__.2>
+            <Name>profiler3</Name>
+            <ExpressionDisplay>
+             <Color>false</Color>
+             <ColorBack>16777215</ColorBack>
+             <ColorText>0</ColorText>
+             <Enabled>false</Enabled>
+             <Hi>0</Hi>
+             <Lo>0</Lo>
+             <Scale>Linear</Scale>
+            </ExpressionDisplay>
+           </__.2>
+          </Variables>
          </VariableData>
          <WatchPaneData.0>
           <IsRealTimeEnabled>false</IsRealTimeEnabled>
@@ -280,17 +818,17 @@
       </WatchViews>
      </ViewData>
      <ViewLayout>
-      <PrimaryDocumentPaneId>6</PrimaryDocumentPaneId>
+      <PrimaryDocumentPaneId>7</PrimaryDocumentPaneId>
       <Frames>
        <__.0>
         <FocusedViewId>8</FocusedViewId>
         <FrameState>3</FrameState>
         <IsPrimary>true</IsPrimary>
         <Bounds>
-         <Bottom>960</Bottom>
-         <Left>2152</Left>
-         <Right>3176</Right>
-         <Top>192</Top>
+         <Bottom>774</Bottom>
+         <Left>1823</Left>
+         <Right>2847</Right>
+         <Top>6</Top>
         </Bounds>
         <Dock>
          <DockType>None</DockType>
@@ -298,149 +836,181 @@
          <IsDocumentPane>false</IsDocumentPane>
          <IsPinned>false</IsPinned>
          <IsTabbed>false</IsTabbed>
-         <Orientation>Vertical</Orientation>
+         <Orientation>Horizontal</Orientation>
          <TopTabViewId>-1</TopTabViewId>
          <ViewId>-1</ViewId>
          <Children>
           <__.0>
            <DockType>None</DockType>
-           <Extent>0.7</Extent>
+           <Extent>0.68399</Extent>
            <IsDocumentPane>false</IsDocumentPane>
            <IsPinned>false</IsPinned>
            <IsTabbed>false</IsTabbed>
-           <Orientation>Horizontal</Orientation>
+           <Orientation>Vertical</Orientation>
            <TopTabViewId>-1</TopTabViewId>
            <ViewId>-1</ViewId>
            <Children>
             <__.0>
              <DockType>None</DockType>
-             <Extent>0.25</Extent>
+             <Extent>0.7</Extent>
              <IsDocumentPane>false</IsDocumentPane>
              <IsPinned>false</IsPinned>
-             <IsTabbed>true</IsTabbed>
-             <Orientation>None</Orientation>
-             <TopTabViewId>0</TopTabViewId>
+             <IsTabbed>false</IsTabbed>
+             <Orientation>Horizontal</Orientation>
+             <TopTabViewId>-1</TopTabViewId>
              <ViewId>-1</ViewId>
              <Children>
               <__.0>
-               <DockType>View</DockType>
-               <Extent>1</Extent>
+               <DockType>None</DockType>
+               <Extent>0.25</Extent>
                <IsDocumentPane>false</IsDocumentPane>
                <IsPinned>false</IsPinned>
-               <IsTabbed>false</IsTabbed>
+               <IsTabbed>true</IsTabbed>
                <Orientation>None</Orientation>
-               <TopTabViewId>-1</TopTabViewId>
-               <ViewId>0</ViewId>
+               <TopTabViewId>0</TopTabViewId>
+               <ViewId>-1</ViewId>
+               <Children>
+                <__.0>
+                 <DockType>View</DockType>
+                 <Extent>1</Extent>
+                 <IsDocumentPane>false</IsDocumentPane>
+                 <IsPinned>false</IsPinned>
+                 <IsTabbed>false</IsTabbed>
+                 <Orientation>None</Orientation>
+                 <TopTabViewId>-1</TopTabViewId>
+                 <ViewId>0</ViewId>
+                </__.0>
+                <__.1>
+                 <DockType>View</DockType>
+                 <Extent>1</Extent>
+                 <IsDocumentPane>false</IsDocumentPane>
+                 <IsPinned>false</IsPinned>
+                 <IsTabbed>false</IsTabbed>
+                 <Orientation>None</Orientation>
+                 <TopTabViewId>-1</TopTabViewId>
+                 <ViewId>1</ViewId>
+                </__.1>
+               </Children>
               </__.0>
               <__.1>
-               <DockType>View</DockType>
-               <Extent>1</Extent>
-               <IsDocumentPane>false</IsDocumentPane>
+               <DockType>None</DockType>
+               <Extent>0.75</Extent>
+               <IsDocumentPane>true</IsDocumentPane>
                <IsPinned>false</IsPinned>
-               <IsTabbed>false</IsTabbed>
+               <IsTabbed>true</IsTabbed>
                <Orientation>None</Orientation>
-               <TopTabViewId>-1</TopTabViewId>
-               <ViewId>1</ViewId>
+               <TopTabViewId>8</TopTabViewId>
+               <ViewId>-1</ViewId>
+               <Children>
+                <__.0>
+                 <DockType>Document</DockType>
+                 <Extent>1</Extent>
+                 <IsDocumentPane>false</IsDocumentPane>
+                 <IsPinned>false</IsPinned>
+                 <IsTabbed>false</IsTabbed>
+                 <Orientation>None</Orientation>
+                 <TopTabViewId>-1</TopTabViewId>
+                 <ViewId>8</ViewId>
+                </__.0>
+                <__.1>
+                 <DockType>Document</DockType>
+                 <Extent>1</Extent>
+                 <IsDocumentPane>false</IsDocumentPane>
+                 <IsPinned>false</IsPinned>
+                 <IsTabbed>false</IsTabbed>
+                 <Orientation>None</Orientation>
+                 <TopTabViewId>-1</TopTabViewId>
+                 <ViewId>10</ViewId>
+                </__.1>
+                <__.2>
+                 <DockType>Document</DockType>
+                 <Extent>1</Extent>
+                 <IsDocumentPane>false</IsDocumentPane>
+                 <IsPinned>false</IsPinned>
+                 <IsTabbed>false</IsTabbed>
+                 <Orientation>None</Orientation>
+                 <TopTabViewId>-1</TopTabViewId>
+                 <ViewId>11</ViewId>
+                </__.2>
+               </Children>
               </__.1>
              </Children>
             </__.0>
             <__.1>
              <DockType>None</DockType>
-             <Extent>0.75</Extent>
-             <IsDocumentPane>true</IsDocumentPane>
+             <Extent>0.3</Extent>
+             <IsDocumentPane>false</IsDocumentPane>
              <IsPinned>false</IsPinned>
-             <IsTabbed>true</IsTabbed>
-             <Orientation>None</Orientation>
-             <TopTabViewId>8</TopTabViewId>
+             <IsTabbed>false</IsTabbed>
+             <Orientation>Horizontal</Orientation>
+             <TopTabViewId>-1</TopTabViewId>
              <ViewId>-1</ViewId>
              <Children>
               <__.0>
-               <DockType>Document</DockType>
-               <Extent>1</Extent>
+               <DockType>View</DockType>
+               <Extent>0.4</Extent>
                <IsDocumentPane>false</IsDocumentPane>
                <IsPinned>false</IsPinned>
                <IsTabbed>false</IsTabbed>
-               <Orientation>None</Orientation>
+               <Orientation>Vertical</Orientation>
                <TopTabViewId>-1</TopTabViewId>
-               <ViewId>7</ViewId>
+               <ViewId>2</ViewId>
               </__.0>
               <__.1>
-               <DockType>Document</DockType>
-               <Extent>1</Extent>
+               <DockType>None</DockType>
+               <Extent>0.3</Extent>
+               <IsDocumentPane>false</IsDocumentPane>
+               <IsPinned>false</IsPinned>
+               <IsTabbed>true</IsTabbed>
+               <Orientation>None</Orientation>
+               <TopTabViewId>3</TopTabViewId>
+               <ViewId>-1</ViewId>
+               <Children>
+                <__.0>
+                 <DockType>View</DockType>
+                 <Extent>1</Extent>
+                 <IsDocumentPane>false</IsDocumentPane>
+                 <IsPinned>false</IsPinned>
+                 <IsTabbed>false</IsTabbed>
+                 <Orientation>None</Orientation>
+                 <TopTabViewId>-1</TopTabViewId>
+                 <ViewId>3</ViewId>
+                </__.0>
+                <__.1>
+                 <DockType>View</DockType>
+                 <Extent>1</Extent>
+                 <IsDocumentPane>false</IsDocumentPane>
+                 <IsPinned>false</IsPinned>
+                 <IsTabbed>false</IsTabbed>
+                 <Orientation>None</Orientation>
+                 <TopTabViewId>-1</TopTabViewId>
+                 <ViewId>4</ViewId>
+                </__.1>
+               </Children>
+              </__.1>
+              <__.2>
+               <DockType>View</DockType>
+               <Extent>0.3</Extent>
                <IsDocumentPane>false</IsDocumentPane>
                <IsPinned>false</IsPinned>
                <IsTabbed>false</IsTabbed>
-               <Orientation>None</Orientation>
+               <Orientation>Vertical</Orientation>
                <TopTabViewId>-1</TopTabViewId>
-               <ViewId>8</ViewId>
-              </__.1>
+               <ViewId>5</ViewId>
+              </__.2>
              </Children>
             </__.1>
            </Children>
           </__.0>
           <__.1>
-           <DockType>None</DockType>
-           <Extent>0.3</Extent>
+           <DockType>View</DockType>
+           <Extent>0.31601</Extent>
            <IsDocumentPane>false</IsDocumentPane>
            <IsPinned>false</IsPinned>
            <IsTabbed>false</IsTabbed>
-           <Orientation>Horizontal</Orientation>
+           <Orientation>Vertical</Orientation>
            <TopTabViewId>-1</TopTabViewId>
-           <ViewId>-1</ViewId>
-           <Children>
-            <__.0>
-             <DockType>View</DockType>
-             <Extent>0.4</Extent>
-             <IsDocumentPane>false</IsDocumentPane>
-             <IsPinned>false</IsPinned>
-             <IsTabbed>false</IsTabbed>
-             <Orientation>Vertical</Orientation>
-             <TopTabViewId>-1</TopTabViewId>
-             <ViewId>2</ViewId>
-            </__.0>
-            <__.1>
-             <DockType>None</DockType>
-             <Extent>0.3</Extent>
-             <IsDocumentPane>false</IsDocumentPane>
-             <IsPinned>false</IsPinned>
-             <IsTabbed>true</IsTabbed>
-             <Orientation>None</Orientation>
-             <TopTabViewId>3</TopTabViewId>
-             <ViewId>-1</ViewId>
-             <Children>
-              <__.0>
-               <DockType>View</DockType>
-               <Extent>1</Extent>
-               <IsDocumentPane>false</IsDocumentPane>
-               <IsPinned>false</IsPinned>
-               <IsTabbed>false</IsTabbed>
-               <Orientation>None</Orientation>
-               <TopTabViewId>-1</TopTabViewId>
-               <ViewId>3</ViewId>
-              </__.0>
-              <__.1>
-               <DockType>View</DockType>
-               <Extent>1</Extent>
-               <IsDocumentPane>false</IsDocumentPane>
-               <IsPinned>false</IsPinned>
-               <IsTabbed>false</IsTabbed>
-               <Orientation>None</Orientation>
-               <TopTabViewId>-1</TopTabViewId>
-               <ViewId>4</ViewId>
-              </__.1>
-             </Children>
-            </__.1>
-            <__.2>
-             <DockType>View</DockType>
-             <Extent>0.3</Extent>
-             <IsDocumentPane>false</IsDocumentPane>
-             <IsPinned>false</IsPinned>
-             <IsTabbed>false</IsTabbed>
-             <Orientation>Vertical</Orientation>
-             <TopTabViewId>-1</TopTabViewId>
-             <ViewId>5</ViewId>
-            </__.2>
-           </Children>
+           <ViewId>12</ViewId>
           </__.1>
          </Children>
         </Dock>
