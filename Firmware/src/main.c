@@ -2,6 +2,23 @@
  * Copyright (c) 2016 Intel Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
+ *
+ *
+ * SSST blood sugar. Device for contacless measuring of blood sugar.
+ * Copyright (C) 2022  Azurtest
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 #include <device.h>
@@ -10,41 +27,61 @@
 #include <zephyr.h>
 
 #include <bluetooth/conn.h>
+#include <hal/nrf_gpio.h>
+#include <hal/nrf_lpcomp.h>
+#include <hal/nrf_power.h>
 
-/* 1000 msec = 1 sec */
-#define SLEEP_TIME_MS 1000
-
-/* The devicetree node identifier for the "led0" alias. */
-#define LED0_NODE DT_ALIAS(led0)
-
-#if DT_NODE_HAS_STATUS(LED0_NODE, okay)
-#define LED0 DT_GPIO_LABEL(LED0_NODE, gpios)
-#define PIN DT_GPIO_PIN(LED0_NODE, gpios)
-#define FLAGS DT_GPIO_FLAGS(LED0_NODE, gpios)
-#else
-/* A build error here means your board isn't set up to blink an LED. */
-#error "Unsupported board: led0 devicetree alias is not defined"
-#define LED0 ""
-#define PIN 0
-#define FLAGS 0
-#endif
-
-/* Defines */
-#define RAW_DATA_SIZE 10  // This will change after testing
-#define AVG_DATA_SIZE 100  // This will change after testing
+#include "config.h"
 
 /* Variables */
-uint8_t isInternalAdc = 1;
-uint16_t adcAveragedData[AVG_DATA_SIZE];
-uint16_t adcRawData[RAW_DATA_SIZE];
+static uint8_t isInternalAdc = 1;
+static uint16_t adcAvgData[AVG_DATA_SIZE];
+static uint16_t adcRawData[RAW_DATA_SIZE];
 
-struct bt_conn_cb btConnectionCallback;
+/* Initial button state */
+static uint8_t buttonCurrStatus = BUTTON_LOGIC;
+static uint8_t buttonPrevStatus = BUTTON_LOGIC;
+
+static uint8_t startShutdnTimer;
+
+static struct bt_conn_cb btConnectionCb;
+static struct k_timer shutdnTimer;
+
+extern void shutdnTimerCb(struct k_timer* timer_id)
+{
+  uint8_t buttonStart;
+  uint8_t buttonCurrent;
+
+  buttonStart = nrf_gpio_pin_read(BTN_SHUTDN_SW);
+
+  nrf_gpio_pin_set(LED_SHUTDN);
+  nrf_lpcomp_enable(NRF_LPCOMP);
+
+  do
+  {
+    buttonCurrent = nrf_gpio_pin_read(BTN_SHUTDN_SW);
+  } while(buttonStart == buttonCurrent);
+
+  nrf_gpio_cfg_sense_set(BTN_SHUTDN_SW, NRF_GPIO_PIN_SENSE_LOW);
+  nrf_power_system_off(NRF_POWER);
+
+  while(1)
+  {
+    // Loop needed for debugging purpose.
+  }
+}
 
 static void systemInit()
 {
   // Peripheral initialization
+  nrf_gpio_cfg_input(BTN_SHUTDN_SW, NRF_GPIO_PIN_PULLUP);
+  nrf_gpio_cfg_output(LED_SHUTDN);
+  nrf_gpio_pin_set(LED_SHUTDN);
 
   // BT initialization
+
+  // Kernel init
+  k_timer_init(&shutdnTimer, shutdnTimerCb, NULL);
 }
 
 static void BTN_AdcSwitch()
@@ -67,6 +104,29 @@ static void BTN_AdcSwitch()
 static void BTN_ShutDown()
 {
   // Check if button is pressed for 3 s. Polling.
+
+  buttonCurrStatus = nrf_gpio_pin_read(BTN_SHUTDN_SW);
+
+  if(buttonPrevStatus != buttonCurrStatus)
+  {
+    // Button pressed or released
+    if(startShutdnTimer == 0)
+    {
+      // Button pressed; start timer
+      nrf_gpio_pin_clear(LED_SHUTDN);
+      k_timer_start(&shutdnTimer, K_MSEC(BTN_SHUTDN_DELAY), K_NO_WAIT);
+      startShutdnTimer = 1;
+    }
+    else
+    {
+      // Button released; stop timer
+      nrf_gpio_pin_set(LED_SHUTDN);
+      k_timer_stop(&shutdnTimer);
+      startShutdnTimer = 0;
+    }
+  }
+
+  buttonPrevStatus = buttonCurrStatus;
 }
 
 static uint16_t adcSampleAverage(uint16_t* array, size_t size)
@@ -136,7 +196,7 @@ static void LED_LowBattery()
 
 void main(void)
 {
-  // systemInit();
+  systemInit();
   //  BT, ADC, LEDs, GPIOs everything is prepared
 
   while(1)
