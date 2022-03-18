@@ -16,26 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __CONFIG
-#define __CONFIG
+#ifndef __CONFIG_H
+#define __CONFIG_H
 
 /* Defines */
 #define RAW_DATA_SIZE 10  // This will change after testing
 #define AVG_DATA_SIZE 100  // This will change after testing
 #define BTN_SHUTDN_DELAY 2500  // value in ms
+#define ADC_RESOLUTION 4096 // 12-bit resolution
 
 /* HW defines. LEDs, Buttons etc. */
-#define BTN_SHUTDN_SW 24
-#define LED_SHUTDN 13
-#define LED_LOWBATT 14
+#define BTN_SHUTDN 24
+#define BTN_ADC_CHG 25
+#define LED_STATUS 13
+#define LED_BATT 14
+#define DCDC_SHTDN_3V3 3
+#define DCDC_SHTDN_5V 28
+#define AIN_BATT_SENS 29
+#define AIN_BLOOD_SENS 4
 
 /* HW configuration. LOW, HIGH logic etc. */
-#define BUTTON_POS_LOGIC 0
+#define BUTTON_POS_LOGIC 0  // Is button positve logic? Released LOW state, pressed HIGH state
+#define BATT_MIN_VOLT (3)
 
 #if BUTTON_POS_LOGIC
-#define BUTTON_LOGIC 1
-#else
 #define BUTTON_LOGIC 0
+#else
+#define BUTTON_LOGIC 1
 #endif
 
 #endif  //__CONFIG
