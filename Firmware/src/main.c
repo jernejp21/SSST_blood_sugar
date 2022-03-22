@@ -31,6 +31,7 @@
 #include <hal/nrf_lpcomp.h>
 #include <hal/nrf_power.h>
 
+#include "IO.h"
 #include "config.h"
 
 /* Variables */
@@ -52,18 +53,17 @@ extern void shutdnTimerCb(struct k_timer* timer_id)
   uint8_t buttonStart;
   uint8_t buttonCurrent;
 
-  buttonStart = nrf_gpio_pin_read(BTN_SHUTDN_SW);
+  buttonStart = BTN_ShutdnStatus();
 
-  nrf_gpio_pin_set(LED_SHUTDN);
-  nrf_lpcomp_enable(NRF_LPCOMP);
+  LED_StatusOff();
 
   do
   {
-    buttonCurrent = nrf_gpio_pin_read(BTN_SHUTDN_SW);
+    buttonCurrent = BTN_ShutdnStatus();
   } while(buttonStart == buttonCurrent);
 
-  nrf_gpio_cfg_sense_set(BTN_SHUTDN_SW, NRF_GPIO_PIN_SENSE_LOW);
-  nrf_power_system_off(NRF_POWER);
+  DCDC_5VSwitchOff();
+  DCDC_3V3SwitchOff();
 
   while(1)
   {
@@ -74,9 +74,9 @@ extern void shutdnTimerCb(struct k_timer* timer_id)
 static void systemInit()
 {
   // Peripheral initialization
-  nrf_gpio_cfg_input(BTN_SHUTDN_SW, NRF_GPIO_PIN_PULLUP);
-  nrf_gpio_cfg_output(LED_SHUTDN);
-  nrf_gpio_pin_set(LED_SHUTDN);
+  //nrf_gpio_cfg_input(BTN_SHUTDN_SW, NRF_GPIO_PIN_PULLUP);
+  //nrf_gpio_cfg_output(LED_SHUTDN);
+  //nrf_gpio_pin_set(LED_SHUTDN);
 
   // BT initialization
 
@@ -103,9 +103,9 @@ static void BTN_AdcSwitch()
 
 static void BTN_ShutDown()
 {
-  // Check if button is pressed for 3 s. Polling.
+  // Check if button is pressed for BTN_SHUTDN_DELAY in ms.
 
-  buttonCurrStatus = nrf_gpio_pin_read(BTN_SHUTDN_SW);
+  buttonCurrStatus = BTN_ShutdnStatus();
 
   if(buttonPrevStatus != buttonCurrStatus)
   {
@@ -113,14 +113,15 @@ static void BTN_ShutDown()
     if(startShutdnTimer == 0)
     {
       // Button pressed; start timer
-      nrf_gpio_pin_clear(LED_SHUTDN);
+      LED_StatusOn();
+      // When timer runs out, shutdnTimerCb is called.
       k_timer_start(&shutdnTimer, K_MSEC(BTN_SHUTDN_DELAY), K_NO_WAIT);
       startShutdnTimer = 1;
     }
     else
     {
       // Button released; stop timer
-      nrf_gpio_pin_set(LED_SHUTDN);
+      LED_StatusOff();
       k_timer_stop(&shutdnTimer);
       startShutdnTimer = 0;
     }
@@ -148,6 +149,7 @@ static void readADC()
   if(isInternalAdc == 1)
   {
     // Read internal ADC
+    // ADC sampling, averaging and transfer to RAM is done with DMA.
   }
   else
   {
@@ -201,7 +203,6 @@ void main(void)
 
   while(1)
   {
-    // k_uptime_get_32();
     BTN_ShutDown();  // read on 50 ms interval
     readADC();  // read on sampling interval
     BT_SendData();  // send when buffer full
