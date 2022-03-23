@@ -43,10 +43,32 @@ static uint16_t adcRawData[RAW_DATA_SIZE];
 static uint8_t buttonCurrStatus = BUTTON_LOGIC;
 static uint8_t buttonPrevStatus = BUTTON_LOGIC;
 
+/* Kernel variables */
 static uint8_t startShutdnTimer;
-
 static struct bt_conn_cb btConnectionCb;
 static struct k_timer shutdnTimer;
+static struct k_timer ledStartupBlink;
+
+/* Functions */
+
+extern void ledStartupBlinkCb(struct k_timer* timer_id)
+{
+  static int blinkCnt = 0;
+  int nrOfBlinks = 6;  // 3 times on, 3 times off
+
+  LED_StatusToggle();
+  blinkCnt++;
+  if(blinkCnt == nrOfBlinks)
+  {
+    k_timer_start(&ledStartupBlink, K_MSEC(2000), K_NO_WAIT); //after blinks, turn on led for some time
+    LED_StatusToggle();
+  }
+  if(blinkCnt == (nrOfBlinks + 1))
+  {
+    k_timer_stop(&ledStartupBlink);
+    LED_StatusOff();
+  }
+}
 
 extern void shutdnTimerCb(struct k_timer* timer_id)
 {
@@ -82,6 +104,7 @@ static void systemInit()
 
   // Kernel init
   k_timer_init(&shutdnTimer, shutdnTimerCb, NULL);
+  k_timer_init(&ledStartupBlink, ledStartupBlinkCb, NULL);
 }
 
 static void BTN_AdcSwitch()
@@ -200,6 +223,8 @@ void main(void)
 {
   systemInit();
   //  BT, ADC, LEDs, GPIOs everything is prepared
+  // Begin LED start-up complete sequence
+  k_timer_start(&ledStartupBlink, K_MSEC(100), K_MSEC(100));
 
   while(1)
   {
