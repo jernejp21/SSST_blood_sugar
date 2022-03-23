@@ -27,7 +27,7 @@ void LED_StatusOn()
 
 void LED_StatusOff()
 {
-  nrf_gpio_pin_clear(LED_STATUS);
+  nrf_gpio_pin_set(LED_STATUS);
 }
 
 void LED_StatusToggle()
@@ -37,10 +37,12 @@ void LED_StatusToggle()
 
 void LED_BatteryOn()
 {
+  nrf_gpio_pin_clear(LED_BATT);
 }
 
 void LED_BatteryOff()
 {
+  nrf_gpio_pin_set(LED_BATT);
 }
 
 void DCDC_3V3SwitchOff()
@@ -75,7 +77,22 @@ uint8_t BTN_AdcChgStatus()
   return status;
 }
 
-void SAADC_EnableIntADC();
-void SAADC_DisableIntADC();
-void SAADC_EnableExtADC();
-void SAADC_DisableExtADC();
+void SAADC_EnableIntADC()
+{
+
+}
+
+void SAADC_DisableIntADC()
+{
+
+}
+
+void SAADC_EnableExtADC()
+{
+
+}
+
+void SAADC_DisableExtADC()
+{
+
+}

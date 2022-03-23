@@ -37,7 +37,7 @@
 
 /* HW configuration. LOW, HIGH logic etc. */
 #define BUTTON_POS_LOGIC 0  // Is button positve logic? Released LOW state, pressed HIGH state
-#define BATT_MIN_VOLT (3)
+#define BATT_MIN_VOLT (3.0)
 
 #if BUTTON_POS_LOGIC
 #define BUTTON_LOGIC 0

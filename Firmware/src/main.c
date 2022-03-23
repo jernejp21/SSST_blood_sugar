@@ -35,13 +35,9 @@
 #include "config.h"
 
 /* Variables */
-static uint8_t isInternalAdc = 1;
+volatile uint8_t isInternalAdc = 0;
 static uint16_t adcAvgData[AVG_DATA_SIZE];
 static uint16_t adcRawData[RAW_DATA_SIZE];
-
-/* Initial button state */
-static uint8_t buttonCurrStatus = BUTTON_LOGIC;
-static uint8_t buttonPrevStatus = BUTTON_LOGIC;
 
 /* Kernel variables */
 static uint8_t startShutdnTimer;
@@ -50,6 +46,22 @@ static struct k_timer shutdnTimer;
 static struct k_timer ledStartupBlink;
 
 /* Functions */
+
+static void ledExtADCSelPattern()
+{
+  LED_StatusOn();
+  k_sleep(K_MSEC(200));
+  LED_StatusOff();
+}
+
+static void ledIntADCSelPattern()
+{
+  LED_StatusOn();
+  LED_BatteryOn();
+  k_sleep(K_MSEC(200));
+  LED_StatusOff();
+  LED_BatteryOff();
+}
 
 extern void ledStartupBlinkCb(struct k_timer* timer_id)
 {
@@ -60,7 +72,7 @@ extern void ledStartupBlinkCb(struct k_timer* timer_id)
   blinkCnt++;
   if(blinkCnt == nrOfBlinks)
   {
-    k_timer_start(&ledStartupBlink, K_MSEC(2000), K_NO_WAIT); //after blinks, turn on led for some time
+    k_timer_start(&ledStartupBlink, K_MSEC(2000), K_NO_WAIT);  // after blinks, turn on led for some time
     LED_StatusToggle();
   }
   if(blinkCnt == (nrOfBlinks + 1))
@@ -77,12 +89,16 @@ extern void shutdnTimerCb(struct k_timer* timer_id)
 
   buttonStart = BTN_ShutdnStatus();
 
-  LED_StatusOff();
+  LED_StatusOn();
+  LED_BatteryOn();
 
   do
   {
     buttonCurrent = BTN_ShutdnStatus();
   } while(buttonStart == buttonCurrent);
+
+  LED_StatusOff();
+  LED_BatteryOff();
 
   DCDC_5VSwitchOff();
   DCDC_3V3SwitchOff();
@@ -93,69 +109,82 @@ extern void shutdnTimerCb(struct k_timer* timer_id)
   }
 }
 
-static void systemInit()
+static void adcSwitchBtn(void* p1, void* p2, void* p3)
 {
-  // Peripheral initialization
-  //nrf_gpio_cfg_input(BTN_SHUTDN_SW, NRF_GPIO_PIN_PULLUP);
-  //nrf_gpio_cfg_output(LED_SHUTDN);
-  //nrf_gpio_pin_set(LED_SHUTDN);
+  volatile uint8_t buttonCurrStatus = BUTTON_LOGIC;
+  volatile uint8_t buttonPrevStatus = BUTTON_LOGIC;
 
-  // BT initialization
+  while(1)
+  {
 
-  // Kernel init
-  k_timer_init(&shutdnTimer, shutdnTimerCb, NULL);
-  k_timer_init(&ledStartupBlink, ledStartupBlinkCb, NULL);
+    buttonCurrStatus = BTN_ShutdnStatus();
+
+    if((buttonPrevStatus != buttonCurrStatus) && (buttonCurrStatus == BUTTON_LOGIC))
+    {
+      // Switch between internal and external ADC. Interrupt
+      if(isInternalAdc == 1)
+      {
+        // Switch to external ADC
+        SAADC_DisableIntADC();
+        SAADC_EnableExtADC();
+        ledExtADCSelPattern();
+
+        isInternalAdc = 0;
+      }
+      else
+      {
+        // Switch to internal ADC
+        SAADC_DisableExtADC();
+        SAADC_EnableIntADC();
+        ledIntADCSelPattern();
+
+        isInternalAdc = 1;
+      }
+    }
+
+    buttonPrevStatus = buttonCurrStatus;
+
+    k_msleep(50);
+  }
 }
 
-static void BTN_AdcSwitch()
+static void shutDnBtn(void* p1, void* p2, void* p3)
 {
-  // Switch between internal and external ADC. Interrupt
-  if(isInternalAdc == 1)
+  uint8_t buttonCurrStatus = BUTTON_LOGIC;
+  uint8_t buttonPrevStatus = BUTTON_LOGIC;
+
+  while(1)
   {
-    // Switch to external ADC
 
-    isInternalAdc = 0;
-  }
-  else
-  {
-    // Switch to internal ADC
+    buttonCurrStatus = BTN_ShutdnStatus();
 
-    isInternalAdc = 1;
-  }
-}
-
-static void BTN_ShutDown()
-{
-  // Check if button is pressed for BTN_SHUTDN_DELAY in ms.
-
-  buttonCurrStatus = BTN_ShutdnStatus();
-
-  if(buttonPrevStatus != buttonCurrStatus)
-  {
-    // Button pressed or released
-    if(startShutdnTimer == 0)
+    if(buttonPrevStatus != buttonCurrStatus)
     {
-      // Button pressed; start timer
-      LED_StatusOn();
-      // When timer runs out, shutdnTimerCb is called.
-      k_timer_start(&shutdnTimer, K_MSEC(BTN_SHUTDN_DELAY), K_NO_WAIT);
-      startShutdnTimer = 1;
+      // Button pressed or released
+      if(startShutdnTimer == 0)
+      {
+        // Button pressed; start timer
+        // When timer runs out, shutdnTimerCb is called.
+        k_timer_start(&shutdnTimer, K_MSEC(BTN_SHUTDN_DELAY), K_NO_WAIT);
+        startShutdnTimer = 1;
+      }
+      else
+      {
+        // Button released; stop timer
+        k_timer_stop(&shutdnTimer);
+        startShutdnTimer = 0;
+      }
     }
-    else
-    {
-      // Button released; stop timer
-      LED_StatusOff();
-      k_timer_stop(&shutdnTimer);
-      startShutdnTimer = 0;
-    }
-  }
 
-  buttonPrevStatus = buttonCurrStatus;
+    buttonPrevStatus = buttonCurrStatus;
+
+    k_msleep(50);
+  }
 }
 
 static uint16_t adcSampleAverage(uint16_t* array, size_t size)
 {
-  uint32_t avg;
+  uint32_t avg = 0;
 
   for(size_t index = 0; index < size; index++)
   {
@@ -167,16 +196,58 @@ static uint16_t adcSampleAverage(uint16_t* array, size_t size)
   return (uint16_t)avg;
 }
 
+uint16_t avg_cnt = 0;
+uint16_t result;
+
 static void readADC()
 {
-  if(isInternalAdc == 1)
+  volatile uint16_t sampleArray[10];
+
+  while(1)
   {
-    // Read internal ADC
-    // ADC sampling, averaging and transfer to RAM is done with DMA.
+    for(int i = 0; i < 10; i++)
+    {
+      sampleArray[i] = (avg_cnt + i) * 2;
+    }
+    avg_cnt++;
+
+    if(isInternalAdc == 1)
+    {
+      //  Read internal ADC
+      //  ADC sampling, averaging and transfer to RAM is done with DMA.
+    }
+    else
+    {
+      // Read external ADC
+      // result = adcSampleAverage(sampleArray, 10);
+    }
+
+    k_sleep(K_MSEC(100));
   }
-  else
+}
+
+static void checkBattStatus()
+{
+  isInternalAdc = 1;
+}
+
+static void heartBeat(void* p1, void* p2, void* p3)
+{
+  void (*hbPattern)();
+
+  while(1)
   {
-    // Read external ADC
+    if(isInternalAdc == 1)
+    {
+      hbPattern = ledIntADCSelPattern;
+    }
+    else
+    {
+      hbPattern = ledExtADCSelPattern;
+    }
+
+    hbPattern();
+    k_sleep(K_SECONDS(5));
   }
 }
 
@@ -199,37 +270,95 @@ static void compressData(uint16_t* rawData, uint16_t* compressedData)
 {
 }
 
-static void LED_PowerOn()
+static void LED_Init()
+{
+  nrf_gpio_cfg_output(LED_STATUS);
+  nrf_gpio_cfg_output(LED_BATT);
+  LED_StatusOff();
+  LED_BatteryOff();
+}
+
+static void BTN_Init()
+{
+  nrf_gpio_cfg_input(BTN_SHUTDN, NRF_GPIO_PIN_PULLUP);
+  nrf_gpio_cfg_input(BTN_ADC_CHG, NRF_GPIO_PIN_PULLUP);
+}
+
+static void GPIO_Init()
+{
+  DCDC_3V3SwitchOn();
+  DCDC_5VSwitchOn();
+  nrf_gpio_cfg_output(DCDC_SHTDN_3V3);
+  nrf_gpio_cfg_output(DCDC_SHTDN_5V);
+}
+
+static void SPIM_Init()
 {
 }
 
-static void LED_PowerOff()
+static void SAADC_Init()
 {
 }
 
-static void LED_externalAdcSelected()
+static void BT_Init()
 {
 }
 
-static void LED_internalAdcSelected()
-{
-}
+K_THREAD_STACK_DEFINE(stk_ShutDnBtn, 1024);
+struct k_thread thr_ShutDnBtn;
+K_THREAD_STACK_DEFINE(stk_adcSwitchBtn, 1024);
+struct k_thread thr_adcSwitchBtn;
+K_THREAD_STACK_DEFINE(stk_heartBeatStack, 1024);
+struct k_thread thr_heartBeat;
 
-static void LED_LowBattery()
+static void kernelInit()
 {
+  int priority;
+
+  /* Init threads but don't start them yet. */
+  priority = 5;
+  k_thread_create(&thr_ShutDnBtn, stk_ShutDnBtn, K_THREAD_STACK_SIZEOF(stk_ShutDnBtn), shutDnBtn, NULL, NULL, NULL, priority, 0, K_NO_WAIT);
+  k_thread_name_set(&thr_ShutDnBtn, "Shutdown button");
+
+  priority = 5;
+  k_thread_create(&thr_adcSwitchBtn, stk_adcSwitchBtn, K_THREAD_STACK_SIZEOF(stk_adcSwitchBtn), adcSwitchBtn, NULL, NULL, NULL, priority, 0, K_NO_WAIT);
+  k_thread_name_set(&thr_adcSwitchBtn, "ADC switch button");
+
+  priority = 5;
+  k_thread_create(&thr_heartBeat, stk_heartBeatStack, K_THREAD_STACK_SIZEOF(stk_heartBeatStack), heartBeat, NULL, NULL, NULL, priority, 0, K_NO_WAIT);
+  k_thread_name_set(&thr_heartBeat, "Heartbeat");
+
+  /* Timer init */
+  k_timer_init(&shutdnTimer, shutdnTimerCb, NULL);
+  k_timer_init(&ledStartupBlink, ledStartupBlinkCb, NULL);
 }
 
 void main(void)
 {
-  systemInit();
+  /* System init */
+  isInternalAdc = 1;
+  LED_Init();
+  BTN_Init();
+  GPIO_Init();
+  // SPIM_Init();
+  // SAADC_Init();
+  // BT_Init();
+  isInternalAdc = 0;
+  kernelInit();
+  /* End of system init */
+
   //  BT, ADC, LEDs, GPIOs everything is prepared
   // Begin LED start-up complete sequence
   k_timer_start(&ledStartupBlink, K_MSEC(100), K_MSEC(100));
 
-  while(1)
-  {
-    BTN_ShutDown();  // read on 50 ms interval
-    readADC();  // read on sampling interval
-    BT_SendData();  // send when buffer full
-  }
+  // main is only for system init. Afterwards everyhing is done in threads.
+  k_sleep(K_FOREVER);
+
+  // while(1)
+  //{
+  //  BTN_ShutDown();  // read on 50 ms interval
+  //  readADC();  // read on 50 ms interval
+  BT_SendData();  // send when buffer full
+
+  //}
 }
