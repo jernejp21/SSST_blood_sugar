@@ -23,7 +23,8 @@
 #define RAW_DATA_SIZE 10  // This will change after testing
 #define AVG_DATA_SIZE 100  // This will change after testing
 #define BTN_SHUTDN_DELAY 2500  // value in ms
-#define ADC_RESOLUTION 4096 // 12-bit resolution
+#define ADC_RESOLUTION 4096  // 12-bit resolution
+#define SAMPLING_RATE 1000  // 1000000/SAMPLING_RATE is samp. freq.
 
 /* HW defines. LEDs, Buttons etc. */
 #define BTN_SHUTDN 24
