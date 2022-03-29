@@ -77,6 +77,13 @@ static void ledIntADCSelPattern()
   LED_BatteryOff();
 }
 
+static void ledLowBattery()
+{
+  LED_BatteryOn();
+  k_busy_wait(200000);
+  LED_BatteryOff();
+}
+
 extern void ledStartupBlinkCb(struct k_timer* timer_id)
 {
   static int blinkCnt = 0;
@@ -230,13 +237,20 @@ static void heartBeat(void* p1, void* p2, void* p3)
 
   while(1)
   {
-    if(isInternalAdc == 1)
+    if(isLowBattery == 1)
     {
-      hbPattern = ledIntADCSelPattern;
+      hbPattern = ledLowBattery;
     }
     else
     {
-      hbPattern = ledExtADCSelPattern;
+      if(isInternalAdc == 1)
+      {
+        hbPattern = ledIntADCSelPattern;
+      }
+      else
+      {
+        hbPattern = ledExtADCSelPattern;
+      }
     }
 
     hbPattern();
@@ -414,7 +428,34 @@ void adcIRQRoutine(const void* arg)
 
 static void checkBattStatus(const void* arg)
 {
-  isInternalAdc = 1;
+  if(NRF_LPCOMP->EVENTS_DOWN == 1)
+  {
+    // Low battery
+    isLowBattery = 1;
+    SAADC_DisableExtADC();
+    SAADC_DisableIntADC();
+    k_thread_suspend(&thr_adcSwitchBtn);
+  }
+
+  if(NRF_LPCOMP->EVENTS_UP == 1)
+  {
+    // Battery is charging. No more low battery
+    isLowBattery = 0;
+    if(isInternalAdc == 1)
+    {
+      SAADC_EnableIntADC();
+    }
+    else
+    {
+      SAADC_EnableExtADC();
+    }
+
+    k_thread_resume(&thr_adcSwitchBtn);
+  }
+
+  NRF_LPCOMP->EVENTS_DOWN = 0;
+  NRF_LPCOMP->EVENTS_UP = 0;
+  NRF_LPCOMP->EVENTS_CROSS = 0;
 }
 
 static void kernelInit()
