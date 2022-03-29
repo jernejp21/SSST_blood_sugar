@@ -38,6 +38,7 @@
 
 /* Variables */
 volatile uint8_t isInternalAdc;
+volatile uint8_t isLowBattery;
 static uint16_t adcAvgData1[AVG_DATA_SIZE];
 static uint16_t adcAvgData2[AVG_DATA_SIZE];
 static int16_t adcRawData[RAW_DATA_SIZE] __attribute__((aligned(2)));
@@ -48,7 +49,6 @@ static uint8_t startShutdnTimer;
 static struct bt_conn_cb btConnectionCb;
 static struct k_timer shutdnTimer;
 static struct k_timer ledStartupBlink;
-k_tid_t buttonThreadID;
 
 K_THREAD_STACK_DEFINE(stk_ShutDnBtn, 1024);
 struct k_thread thr_ShutDnBtn;
@@ -133,13 +133,13 @@ extern void shutdnTimerCb(struct k_timer* timer_id)
 
 static void adcSwitchBtn(void* p1, void* p2, void* p3)
 {
-  volatile uint8_t buttonCurrStatus = BUTTON_LOGIC;
-  volatile uint8_t buttonPrevStatus = BUTTON_LOGIC;
+  uint8_t buttonCurrStatus = BUTTON_LOGIC;
+  uint8_t buttonPrevStatus = BUTTON_LOGIC;
 
   while(1)
   {
 
-    buttonCurrStatus = BTN_ShutdnStatus();
+    buttonCurrStatus = BTN_AdcChgStatus();
 
     if((buttonPrevStatus != buttonCurrStatus) && (buttonCurrStatus == BUTTON_LOGIC))
     {
@@ -299,6 +299,14 @@ static void GPIO_Init()
   nrf_gpio_cfg_output(DCDC_SHTDN_5V);
 }
 
+static void TIMER_Init()
+{
+  nrf_timer_bit_width_set(NRF_TIMER0, NRF_TIMER_BIT_WIDTH_32);
+  nrf_timer_cc_set(NRF_TIMER0, NRF_TIMER_CC_CHANNEL0, SAMPLING_RATE);
+  nrf_timer_int_enable(NRF_TIMER0, NRF_TIMER_INT_COMPARE0_MASK);
+  nrf_timer_shorts_set(NRF_TIMER0, NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK);
+}
+
 static void SPIM_Init()
 {
 }
@@ -343,18 +351,36 @@ static void BT_Init()
 
 void timerIRQRoutine(const void* arg)
 {
-  nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_SAMPLE);
+  // Called on sampling rate. Currently it's 1000 Hz
+
+  if(isInternalAdc == 1)
+  {
+    nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_SAMPLE);
+  }
+  else
+  {
+    // Sample data from external ADC via SPI
+  }
+
   nrf_timer_event_clear(NRF_TIMER0, NRF_TIMER_EVENT_COMPARE0);
 }
 
 void adcIRQRoutine(const void* arg)
 {
+  // Called when EasyDMA is full. Currently is on 10 samples - 100 Hz.
   static uint32_t adcAvgDataCnt = 0;
 
-  nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_STARTED);
-  nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_END);
-  nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_DONE);
-  nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_RESULTDONE);
+  if(isInternalAdc == 1)
+  {
+    nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_STARTED);
+    nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_END);
+    nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_DONE);
+    nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_RESULTDONE);
+  }
+  else
+  {
+    // Clear SPI's EasyDMA interrupt flags.
+  }
 
   p_adcAvgData[adcAvgDataCnt] = adcSampleAverage(adcRawData, RAW_DATA_SIZE);
   adcAvgDataCnt++;
@@ -376,7 +402,14 @@ void adcIRQRoutine(const void* arg)
     adcAvgDataCnt = 0;
   }
 
-  nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_START);
+  if(isInternalAdc == 1)
+  {
+    nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_START);
+  }
+  else
+  {
+    // Sample data from external ADC via SPI
+  }
 }
 
 static void checkBattStatus(const void* arg)
@@ -390,7 +423,7 @@ static void kernelInit()
 
   /* Init threads but don't start them yet. */
   priority = 3;
-  buttonThreadID = k_thread_create(&thr_ShutDnBtn, stk_ShutDnBtn, K_THREAD_STACK_SIZEOF(stk_ShutDnBtn), shutDnBtn, NULL, NULL, NULL, priority, 0, K_MSEC(3000));
+  k_thread_create(&thr_ShutDnBtn, stk_ShutDnBtn, K_THREAD_STACK_SIZEOF(stk_ShutDnBtn), shutDnBtn, NULL, NULL, NULL, priority, 0, K_MSEC(3000));
   k_thread_name_set(&thr_ShutDnBtn, "Shutdown button");
 
   priority = 4;
@@ -407,24 +440,19 @@ static void kernelInit()
   k_thread_suspend(&thr_blueTooth);
 
   /* Init IRQs */
-  nrf_timer_bit_width_set(NRF_TIMER0, NRF_TIMER_BIT_WIDTH_32);
-  nrf_timer_cc_set(NRF_TIMER0, NRF_TIMER_CC_CHANNEL0, SAMPLING_RATE);
-  nrf_timer_int_enable(NRF_TIMER0, NRF_TIMER_INT_COMPARE0_MASK);
-  nrf_timer_shorts_set(NRF_TIMER0, NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK);
-
   priority = -15;
   irq_connect_dynamic(TIMER0_IRQn, priority, timerIRQRoutine, NULL, 0);
   irq_enable(TIMER0_IRQn);
 
   priority = -14;
   irq_connect_dynamic(SAADC_IRQn, priority, adcIRQRoutine, NULL, 0);
-  irq_enable(SAADC_IRQn);
+  // irq_enable(SAADC_IRQn);
 
   priority = -13;
   irq_connect_dynamic(LPCOMP_IRQn, priority, checkBattStatus, NULL, 0);
   irq_enable(LPCOMP_IRQn);
 
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
+  // nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
 
   /* Timer init */
   k_timer_init(&shutdnTimer, shutdnTimerCb, NULL);
@@ -437,6 +465,7 @@ void main(void)
   LED_Init();
   BTN_Init();
   GPIO_Init();
+  TIMER_Init();
   // SPIM_Init();
   SAADC_Init();
   LPCOMP_Init();
@@ -444,7 +473,7 @@ void main(void)
   kernelInit();
   /* End of system init */
 
-  isInternalAdc = 1;
+  isInternalAdc = 0;
   p_adcAvgData = adcAvgData1;
 
   // BT, ADC, LEDs, GPIOs everything is prepared
@@ -452,5 +481,4 @@ void main(void)
   k_timer_start(&ledStartupBlink, K_MSEC(100), K_MSEC(100));
 
   // main is only for system init. Afterwards everyhing is done in threads.
-  k_sleep(K_FOREVER);
 }
