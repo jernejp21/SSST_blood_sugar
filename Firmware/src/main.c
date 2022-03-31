@@ -464,7 +464,10 @@ static void adcAvgIRQ(const void* arg)
 
 static void checkBattStatus(const void* arg)
 {
-  if(NRF_LPCOMP->EVENTS_DOWN == 1)
+  uint8_t status;
+
+  status = nrf_lpcomp_event_check(NRF_LPCOMP, NRF_LPCOMP_EVENT_DOWN);
+  if(status == 1)
   {
     // Low battery
     isLowBattery = 1;
@@ -473,7 +476,8 @@ static void checkBattStatus(const void* arg)
     k_thread_suspend(&thr_adcSwitchBtn);
   }
 
-  if(NRF_LPCOMP->EVENTS_UP == 1)
+  status = nrf_lpcomp_event_check(NRF_LPCOMP, NRF_LPCOMP_EVENT_UP);
+  if(status == 1)
   {
     // Battery is charging. No more low battery
     isLowBattery = 0;
@@ -489,9 +493,9 @@ static void checkBattStatus(const void* arg)
     k_thread_resume(&thr_adcSwitchBtn);
   }
 
-  NRF_LPCOMP->EVENTS_DOWN = 0;
-  NRF_LPCOMP->EVENTS_UP = 0;
-  NRF_LPCOMP->EVENTS_CROSS = 0;
+  nrf_lpcomp_event_clear(NRF_LPCOMP, NRF_LPCOMP_EVENT_DOWN);
+  nrf_lpcomp_event_clear(NRF_LPCOMP, NRF_LPCOMP_EVENT_UP);
+  nrf_lpcomp_event_clear(NRF_LPCOMP, NRF_LPCOMP_EVENT_CROSS);
 }
 
 static void kernelInit()
