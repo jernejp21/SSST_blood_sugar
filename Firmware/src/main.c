@@ -30,19 +30,27 @@
 #include <hal/nrf_gpio.h>
 #include <hal/nrf_lpcomp.h>
 #include <hal/nrf_power.h>
+#include <hal/nrf_ppi.h>
 #include <hal/nrf_saadc.h>
+#include <hal/nrf_spim.h>
 #include <hal/nrf_timer.h>
 
 #include "IO.h"
 #include "config.h"
+
+#define BUFFER_SIZE 3
 
 /* Variables */
 volatile uint8_t isInternalAdc;
 volatile uint8_t isLowBattery;
 static uint16_t adcAvgData1[AVG_DATA_SIZE];
 static uint16_t adcAvgData2[AVG_DATA_SIZE];
-static int16_t adcRawData[RAW_DATA_SIZE] __attribute__((aligned(2)));
+static uint16_t adcRawData[RAW_DATA_SIZE] __attribute__((aligned(2)));
 static uint16_t* p_adcAvgData;
+static uint8_t rx_buff[BUFFER_SIZE] __attribute__((aligned(2)));
+static uint8_t tx_buff[BUFFER_SIZE] __attribute__((aligned(2)));
+static uint32_t adcRawDataCnt;
+static uint32_t adcAvgDataCnt;
 
 /* Kernel variables */
 static uint8_t startShutdnTimer;
@@ -130,7 +138,7 @@ extern void shutdnTimerCb(struct k_timer* timer_id)
   k_thread_abort(&thr_heartBeat);
   k_thread_abort(&thr_ShutDnBtn);
   irq_disable(TIMER0_IRQn);
-  irq_disable(SAADC_IRQn);
+  irq_disable(TIMER1_IRQn);
   irq_disable(LPCOMP_IRQn);
 
   while(1)
@@ -169,6 +177,9 @@ static void adcSwitchBtn(void* p1, void* p2, void* p3)
 
         isInternalAdc = 1;
       }
+
+      adcRawDataCnt = 0;
+      adcAvgDataCnt = 0;
     }
 
     buttonPrevStatus = buttonCurrStatus;
@@ -211,18 +222,12 @@ static void shutDnBtn(void* p1, void* p2, void* p3)
   }
 }
 
-static uint16_t adcSampleAverage(int16_t* array, size_t size)
+static uint16_t adcSampleAverage(uint16_t* array, size_t size)
 {
   uint32_t avg = 0;
-  uint16_t tmp;
 
   for(size_t index = 0; index < size; index++)
   {
-    // ABS value
-    tmp = array[index] >> 15;
-    array[index] ^= tmp;
-    array[index] += tmp & 1;
-
     avg = avg + array[index];
   }
 
@@ -315,14 +320,28 @@ static void GPIO_Init()
 
 static void TIMER_Init()
 {
+  /* Init TIMER0 as timer */
   nrf_timer_bit_width_set(NRF_TIMER0, NRF_TIMER_BIT_WIDTH_32);
   nrf_timer_cc_set(NRF_TIMER0, NRF_TIMER_CC_CHANNEL0, SAMPLING_RATE);
   nrf_timer_int_enable(NRF_TIMER0, NRF_TIMER_INT_COMPARE0_MASK);
   nrf_timer_shorts_set(NRF_TIMER0, NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK);
+
+  /* Init TIMER1 as counter */
+  nrf_timer_mode_set(NRF_TIMER1, NRF_TIMER_MODE_LOW_POWER_COUNTER);
+  nrf_timer_bit_width_set(NRF_TIMER1, NRF_TIMER_BIT_WIDTH_8);
+  nrf_timer_cc_set(NRF_TIMER1, NRF_TIMER_CC_CHANNEL0, RAW_DATA_SIZE);
+  nrf_timer_int_enable(NRF_TIMER1, NRF_TIMER_INT_COMPARE0_MASK);
 }
 
 static void SPIM_Init()
 {
+  nrf_spim_configure(NRF_SPIM3, NRF_SPIM_MODE_2, NRF_SPIM_BIT_ORDER_MSB_FIRST);
+  nrf_spim_pins_set(NRF_SPIM3, SPI_SCK_PIN, SPI_MOSI_PIN, SPI_MISO_PIN);
+  nrf_spim_csn_configure(NRF_SPIM3, SPI_CS_PIN, NRF_SPIM_CSN_POL_LOW, 2);
+  nrf_spim_frequency_set(NRF_SPIM3, NRF_SPIM_FREQ_1M);
+  nrf_spim_rx_buffer_set(NRF_SPIM3, rx_buff, BUFFER_SIZE);
+  nrf_spim_tx_buffer_set(NRF_SPIM3, tx_buff, BUFFER_SIZE);
+  nrf_spim_enable(NRF_SPIM3);
 }
 
 static void SAADC_Init()
@@ -338,9 +357,9 @@ static void SAADC_Init()
 
   nrf_saadc_channel_init(NRF_SAADC, 0, &config);
   nrf_saadc_channel_input_set(NRF_SAADC, 0, NRF_SAADC_INPUT_AIN2, NRF_SAADC_INPUT_DISABLED);
-  nrf_saadc_buffer_init(NRF_SAADC, adcRawData, RAW_DATA_SIZE);
+  nrf_saadc_buffer_init(NRF_SAADC, (int16_t*)rx_buff, 1);
   nrf_saadc_resolution_set(NRF_SAADC, NRF_SAADC_RESOLUTION_12BIT);
-  nrf_saadc_int_enable(NRF_SAADC, NRF_SAADC_INT_END);
+  // nrf_saadc_int_enable(NRF_SAADC, NRF_SAADC_INT_END);
   nrf_saadc_enable(NRF_SAADC);
   nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_START);
 }
@@ -363,38 +382,64 @@ static void BT_Init()
 {
 }
 
-void timerIRQRoutine(const void* arg)
+static void adcSamplingIRQ(const void* arg)
 {
   // Called on sampling rate. Currently it's 1000 Hz
+
+  uint8_t status = 0;
+  uint16_t compoundData;
 
   if(isInternalAdc == 1)
   {
     nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_SAMPLE);
-  }
-  else
-  {
-    // Sample data from external ADC via SPI
-  }
+    do
+    {
+      status = nrf_saadc_event_check(NRF_SAADC, NRF_SAADC_EVENT_END);
+    } while(status == 0);
 
-  nrf_timer_event_clear(NRF_TIMER0, NRF_TIMER_EVENT_COMPARE0);
-}
+    compoundData = (rx_buff[1] << 8) | rx_buff[0];
 
-void adcIRQRoutine(const void* arg)
-{
-  // Called when EasyDMA is full. Currently is on 10 samples - 100 Hz.
-  static uint32_t adcAvgDataCnt = 0;
+    // ABS value
+    uint16_t tmp;
+    tmp = compoundData >> 15;
+    compoundData ^= tmp;
+    compoundData += tmp & 1;
+    adcRawData[adcRawDataCnt] = compoundData;
 
-  if(isInternalAdc == 1)
-  {
     nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_STARTED);
     nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_END);
     nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_DONE);
     nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_RESULTDONE);
+    nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_START);
   }
   else
   {
-    // Clear SPI's EasyDMA interrupt flags.
+    // Sample data from external ADC via SPI
+    nrf_spim_task_trigger(NRF_SPIM3, NRF_SPIM_TASK_START);
+    do
+    {
+      status = nrf_spim_event_check(NRF_SPIM3, NRF_SPIM_EVENT_END);
+    } while(status == 0);
+
+    compoundData = (rx_buff[0] << 12) | (rx_buff[1] << 4) | (rx_buff[2] >> 4);
+    adcRawData[adcRawDataCnt] = compoundData;
+
+    nrf_spim_event_clear(NRF_SPIM3, NRF_SPIM_EVENT_END);
   }
+
+  adcRawDataCnt++;
+  nrf_timer_task_trigger(NRF_TIMER1, NRF_TIMER_TASK_COUNT);
+  nrf_timer_event_clear(NRF_TIMER0, NRF_TIMER_EVENT_COMPARE0);
+}
+
+static void adcAvgIRQ(const void* arg)
+{
+
+  // Called when EasyDMA is full. Currently is on 10 samples - 100 Hz.
+
+  adcRawDataCnt = 0;
+  nrf_timer_event_clear(NRF_TIMER1, NRF_TIMER_EVENT_COMPARE0);
+  nrf_timer_task_trigger(NRF_TIMER1, NRF_TIMER_TASK_CLEAR);
 
   p_adcAvgData[adcAvgDataCnt] = adcSampleAverage(adcRawData, RAW_DATA_SIZE);
   adcAvgDataCnt++;
@@ -402,7 +447,7 @@ void adcIRQRoutine(const void* arg)
   if(adcAvgDataCnt == AVG_DATA_SIZE)
   {
     // Start BT transatction
-    k_thread_resume(&thr_blueTooth);
+    // k_thread_resume(&thr_blueTooth);
     // Change buffer
     if(p_adcAvgData == adcAvgData1)
     {
@@ -414,15 +459,6 @@ void adcIRQRoutine(const void* arg)
     }
 
     adcAvgDataCnt = 0;
-  }
-
-  if(isInternalAdc == 1)
-  {
-    nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_START);
-  }
-  else
-  {
-    // Sample data from external ADC via SPI
   }
 }
 
@@ -482,18 +518,16 @@ static void kernelInit()
 
   /* Init IRQs */
   priority = -15;
-  irq_connect_dynamic(TIMER0_IRQn, priority, timerIRQRoutine, NULL, 0);
+  irq_connect_dynamic(TIMER0_IRQn, priority, adcSamplingIRQ, NULL, 0);
   irq_enable(TIMER0_IRQn);
 
   priority = -14;
-  irq_connect_dynamic(SAADC_IRQn, priority, adcIRQRoutine, NULL, 0);
-  // irq_enable(SAADC_IRQn);
+  irq_connect_dynamic(TIMER1_IRQn, priority, adcAvgIRQ, NULL, 0);
+  irq_enable(TIMER1_IRQn);
 
   priority = -13;
   irq_connect_dynamic(LPCOMP_IRQn, priority, checkBattStatus, NULL, 0);
   irq_enable(LPCOMP_IRQn);
-
-  // nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
 
   /* Timer init */
   k_timer_init(&shutdnTimer, shutdnTimerCb, NULL);
@@ -507,7 +541,7 @@ void main(void)
   BTN_Init();
   GPIO_Init();
   TIMER_Init();
-  // SPIM_Init();
+  SPIM_Init();
   SAADC_Init();
   LPCOMP_Init();
   // BT_Init();
@@ -520,6 +554,7 @@ void main(void)
   // BT, ADC, LEDs, GPIOs everything is prepared
   // Begin LED start-up complete sequence
   k_timer_start(&ledStartupBlink, K_MSEC(100), K_MSEC(100));
+  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
 
   // main is only for system init. Afterwards everyhing is done in threads.
 }

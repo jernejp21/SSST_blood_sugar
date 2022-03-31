@@ -21,6 +21,7 @@
 #include <hal/nrf_gpio.h>
 #include <hal/nrf_saadc.h>
 #include <hal/nrf_timer.h>
+#include <hal/nrf_spim.h>
 
 void LED_StatusOn()
 {
@@ -84,7 +85,6 @@ void SAADC_EnableIntADC()
   // Enable SAADC and start it
   nrf_saadc_enable(NRF_SAADC);
   nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_START);
-  irq_enable(SAADC_IRQn);
 
   // Start timer
   nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
@@ -96,20 +96,22 @@ void SAADC_DisableIntADC()
   nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_STOP);
   nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_CLEAR);
   nrf_timer_event_clear(NRF_TIMER0, NRF_TIMER_EVENT_COMPARE0);
+  nrf_timer_task_trigger(NRF_TIMER1, NRF_TIMER_TASK_CLEAR);
 
   // Disable SAADC EasyDMA interrupt
-  irq_disable(SAADC_IRQn);
   nrf_saadc_disable(NRF_SAADC);
   nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_STOP);
   nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_STARTED);
   nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_END);
   nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_DONE);
   nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_RESULTDONE);
+  nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_STOPPED);
 }
 
 void SAADC_EnableExtADC()
 {
   // Enable SPI
+  nrf_spim_disable(NRF_SPIM3);
 
   // Start timer
   nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
@@ -121,6 +123,13 @@ void SAADC_DisableExtADC()
   nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_STOP);
   nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_CLEAR);
   nrf_timer_event_clear(NRF_TIMER0, NRF_TIMER_EVENT_COMPARE0);
+  nrf_timer_task_trigger(NRF_TIMER1, NRF_TIMER_TASK_CLEAR);
 
   // Disable SPI EasyDMA interrupt
+  nrf_spim_disable(NRF_SPIM3);
+  nrf_spim_event_clear(NRF_SPIM3, NRF_SPIM_EVENT_STOPPED);
+  nrf_spim_event_clear(NRF_SPIM3, NRF_SPIM_EVENT_ENDRX);
+  nrf_spim_event_clear(NRF_SPIM3, NRF_SPIM_EVENT_END);
+  nrf_spim_event_clear(NRF_SPIM3, NRF_SPIM_EVENT_ENDTX);
+  nrf_spim_event_clear(NRF_SPIM3, NRF_SPIM_EVENT_STARTED);
 }
