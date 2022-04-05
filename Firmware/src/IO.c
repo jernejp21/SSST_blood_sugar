@@ -111,7 +111,7 @@ void SAADC_DisableIntADC()
 void SAADC_EnableExtADC()
 {
   // Enable SPI
-  nrf_spim_disable(NRF_SPIM3);
+  nrf_spim_enable(NRF_SPIM3);
 
   // Start timer
   nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);

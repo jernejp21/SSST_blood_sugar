@@ -163,8 +163,8 @@ static void adcSwitchBtn(void* p1, void* p2, void* p3)
       {
         // Switch to external ADC
         SAADC_DisableIntADC();
-        SAADC_EnableExtADC();
         ledExtADCSelPattern();
+        SAADC_EnableExtADC();
 
         isInternalAdc = 0;
       }
@@ -172,8 +172,8 @@ static void adcSwitchBtn(void* p1, void* p2, void* p3)
       {
         // Switch to internal ADC
         SAADC_DisableExtADC();
-        SAADC_EnableIntADC();
         ledIntADCSelPattern();
+        SAADC_EnableIntADC();
 
         isInternalAdc = 1;
       }
@@ -508,8 +508,9 @@ static void kernelInit()
   k_thread_name_set(&thr_ShutDnBtn, "Shutdown button");
 
   priority = 4;
-  k_thread_create(&thr_adcSwitchBtn, stk_adcSwitchBtn, K_THREAD_STACK_SIZEOF(stk_adcSwitchBtn), adcSwitchBtn, NULL, NULL, NULL, priority, 0, K_MSEC(3020));
+  k_thread_create(&thr_adcSwitchBtn, stk_adcSwitchBtn, K_THREAD_STACK_SIZEOF(stk_adcSwitchBtn), adcSwitchBtn, NULL, NULL, NULL, priority, 0, K_NO_WAIT);
   k_thread_name_set(&thr_adcSwitchBtn, "ADC switch button");
+  k_thread_suspend(&thr_adcSwitchBtn);
 
   priority = 5;
   k_thread_create(&thr_heartBeat, stk_heartBeat, K_THREAD_STACK_SIZEOF(stk_heartBeat), heartBeat, NULL, NULL, NULL, priority, 0, K_MSEC(3040));
@@ -538,6 +539,69 @@ static void kernelInit()
   k_timer_init(&ledStartupBlink, ledStartupBlinkCb, NULL);
 }
 
+static void checkStartupBattery()
+{
+  uint8_t status = 0;
+
+  /* Enable SAADC on AIN5 */
+  nrf_saadc_channel_config_t config;
+  config.acq_time = NRF_SAADC_ACQTIME_40US;
+  config.burst = NRF_SAADC_BURST_DISABLED;
+  config.gain = NRF_SAADC_GAIN1_4;
+  config.mode = NRF_SAADC_MODE_SINGLE_ENDED;
+  config.reference = NRF_SAADC_REFERENCE_VDD4;
+  config.resistor_p = NRF_SAADC_RESISTOR_DISABLED;
+  config.resistor_n = NRF_SAADC_RESISTOR_DISABLED;
+
+  nrf_saadc_channel_init(NRF_SAADC, 0, &config);
+  nrf_saadc_channel_input_set(NRF_SAADC, 0, NRF_SAADC_INPUT_AIN5, NRF_SAADC_INPUT_DISABLED);
+  nrf_saadc_buffer_init(NRF_SAADC, (int16_t*)rx_buff, 1);
+  nrf_saadc_resolution_set(NRF_SAADC, NRF_SAADC_RESOLUTION_12BIT);
+  nrf_saadc_enable(NRF_SAADC);
+
+  /* SAADC calibration */
+  nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_CALIBRATEOFFSET);
+  do
+  {
+    status = nrf_saadc_event_check(NRF_SAADC, NRF_SAADC_EVENT_CALIBRATEDONE);
+  } while(status == 0);
+
+  /* Start SAADC */
+  nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_START);
+  do
+  {
+    status = nrf_saadc_event_check(NRF_SAADC, NRF_SAADC_EVENT_STARTED);
+  } while(status == 0);
+
+  /* Sample */
+  nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_SAMPLE);
+  do
+  {
+    status = nrf_saadc_event_check(NRF_SAADC, NRF_SAADC_EVENT_END);
+  } while(status == 0);
+
+  int16_t result = (rx_buff[1] << 8) | rx_buff[0];
+  float voltage = SUPPLY_VOLTAGE * (float)result / 4096;
+
+  if(voltage > BATT_MIN_VOLT)
+  {
+    isInternalAdc = 0;
+    isLowBattery = 0;
+    SAADC_DisableIntADC();
+    SAADC_EnableExtADC();
+    k_thread_resume(&thr_adcSwitchBtn);
+  }
+  else
+  {
+    isLowBattery = 1;
+    SAADC_DisableExtADC();
+    SAADC_DisableIntADC();
+    k_thread_suspend(&thr_adcSwitchBtn);
+  }
+
+  nrf_saadc_disable(NRF_SAADC);
+}
+
 void main(void)
 {
   /* System init */
@@ -546,19 +610,19 @@ void main(void)
   GPIO_Init();
   TIMER_Init();
   SPIM_Init();
-  SAADC_Init();
   LPCOMP_Init();
   // BT_Init();
   kernelInit();
   /* End of system init */
 
-  isInternalAdc = 0;
+  /* Check battery status */
+  checkStartupBattery();
+  SAADC_Init();
+
   p_adcAvgData = adcAvgData1;
 
-  // BT, ADC, LEDs, GPIOs everything is prepared
   // Begin LED start-up complete sequence
   k_timer_start(&ledStartupBlink, K_MSEC(100), K_MSEC(100));
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
 
   // main is only for system init. Afterwards everyhing is done in threads.
 }
