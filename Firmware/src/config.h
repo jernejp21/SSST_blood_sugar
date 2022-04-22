@@ -52,4 +52,14 @@
 #define BUTTON_LOGIC 1
 #endif
 
+/* Enums */
+
+enum
+{
+    ERROR_AMP = 1,
+    ERROR_ADC,
+    ERROR_OTH,
+    ERROR_NONE = 0xFF,
+};
+
 #endif  //__CONFIG

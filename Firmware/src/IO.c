@@ -87,16 +87,16 @@ void SAADC_EnableIntADC()
   nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_START);
 
   // Start timer
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
+  //nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
 }
 
 void SAADC_DisableIntADC()
 {
   // Stop and clear timer
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_STOP);
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_CLEAR);
-  nrf_timer_event_clear(NRF_TIMER0, NRF_TIMER_EVENT_COMPARE0);
-  nrf_timer_task_trigger(NRF_TIMER1, NRF_TIMER_TASK_CLEAR);
+  nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_STOP);
+  nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_CLEAR);
+  nrf_timer_event_clear(NRF_TIMER2, NRF_TIMER_EVENT_COMPARE0);
+  nrf_timer_task_trigger(NRF_TIMER3, NRF_TIMER_TASK_CLEAR);
 
   // Disable SAADC EasyDMA interrupt
   nrf_saadc_disable(NRF_SAADC);
@@ -114,16 +114,16 @@ void SAADC_EnableExtADC()
   nrf_spim_enable(NRF_SPIM3);
 
   // Start timer
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
+  //nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
 }
 
 void SAADC_DisableExtADC()
 {
   // Stop and clear timer
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_STOP);
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_CLEAR);
-  nrf_timer_event_clear(NRF_TIMER0, NRF_TIMER_EVENT_COMPARE0);
-  nrf_timer_task_trigger(NRF_TIMER1, NRF_TIMER_TASK_CLEAR);
+  nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_STOP);
+  nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_CLEAR);
+  nrf_timer_event_clear(NRF_TIMER2, NRF_TIMER_EVENT_COMPARE0);
+  nrf_timer_task_trigger(NRF_TIMER3, NRF_TIMER_TASK_CLEAR);
 
   // Disable SPI EasyDMA interrupt
   nrf_spim_disable(NRF_SPIM3);
