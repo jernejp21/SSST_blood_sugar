@@ -55,6 +55,7 @@
 /* Variables */
 volatile uint8_t isInternalAdc;
 volatile uint8_t isLowBattery;
+volatile uint8_t isNotifyEnabled;
 static uint16_t adcAvgData1[AVG_DATA_SIZE];
 static uint16_t adcAvgData2[AVG_DATA_SIZE];
 static uint16_t adcRawData[RAW_DATA_SIZE] __attribute__((aligned(2)));
@@ -232,7 +233,10 @@ static void adcSwitchBtn(void* p1, void* p2, void* p3)
       }
 
       resetBufferIndex();
-      nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_START);
+      if(isNotifyEnabled == 1)
+      {
+        nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_START);
+      }
     }
 
     buttonPrevStatus = buttonCurrStatus;
@@ -347,11 +351,13 @@ void ssst_ccc_cfg_changed(const struct bt_gatt_attr* attr, uint16_t value)
     nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_STOP);
     k_sem_take(&bleSemaphor, K_NO_WAIT);
     resetBufferIndex();
+    isNotifyEnabled = 0;
     break;
 
   case BT_GATT_CCC_NOTIFY:
     // Start reading data from sensor
     nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_START);
+    isNotifyEnabled = 1;
     break;
 
   default:
