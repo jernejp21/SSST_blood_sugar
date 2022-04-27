@@ -729,7 +729,7 @@ void main(void)
   k_timer_start(&ledStartupBlink, K_MSEC(100), K_MSEC(100));
 
   /* Start BT advertising */
-  //err = bt_enable(BT_Init);
+  err = bt_enable(BT_Init);
 
   if(err != 0)
   {
