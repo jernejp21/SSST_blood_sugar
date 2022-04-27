@@ -377,8 +377,8 @@ static void LED_Init()
 
 static void BTN_Init()
 {
-  nrf_gpio_cfg_input(BTN_SHUTDN, NRF_GPIO_PIN_PULLUP);
-  nrf_gpio_cfg_input(BTN_ADC_CHG, NRF_GPIO_PIN_PULLUP);
+  nrf_gpio_cfg_input(BTN_SHUTDN, NRF_GPIO_PIN_NOPULL);
+  nrf_gpio_cfg_input(BTN_ADC_CHG, NRF_GPIO_PIN_NOPULL);
 }
 
 static void GPIO_Init()
@@ -443,7 +443,7 @@ static void LPCOMP_Init()
   config.hyst = NRF_LPCOMP_HYST_ENABLED;
 
   nrf_lpcomp_configure(NRF_LPCOMP, &config);
-  nrf_lpcomp_input_select(NRF_LPCOMP, NRF_LPCOMP_INPUT_5);
+  nrf_lpcomp_input_select(NRF_LPCOMP, NRF_LPCOMP_INPUT_1);
   nrf_lpcomp_int_enable(NRF_LPCOMP, NRF_LPCOMP_INT_CROSS_MASK);
   nrf_lpcomp_enable(NRF_LPCOMP);
   nrf_lpcomp_task_trigger(NRF_LPCOMP, NRF_LPCOMP_TASK_START);
@@ -634,7 +634,7 @@ static void checkStartupBattery()
   config.resistor_n = NRF_SAADC_RESISTOR_DISABLED;
 
   nrf_saadc_channel_init(NRF_SAADC, 0, &config);
-  nrf_saadc_channel_input_set(NRF_SAADC, 0, NRF_SAADC_INPUT_AIN5, NRF_SAADC_INPUT_DISABLED);
+  nrf_saadc_channel_input_set(NRF_SAADC, 0, NRF_SAADC_INPUT_AIN1, NRF_SAADC_INPUT_DISABLED);
   nrf_saadc_buffer_init(NRF_SAADC, (int16_t*)rx_buff, 1);
   nrf_saadc_resolution_set(NRF_SAADC, NRF_SAADC_RESOLUTION_12BIT);
   nrf_saadc_enable(NRF_SAADC);
