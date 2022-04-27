@@ -504,6 +504,7 @@ static void adcSamplingIRQ(const void* arg)
     // ABS value
     uint16_t tmp;
     tmp = compoundData >> 15;
+    tmp = tmp ? 0xFFFF : 0;
     compoundData ^= tmp;
     compoundData += tmp & 1;
     adcRawData[adcRawDataCnt] = compoundData;
@@ -728,7 +729,7 @@ void main(void)
   k_timer_start(&ledStartupBlink, K_MSEC(100), K_MSEC(100));
 
   /* Start BT advertising */
-  err = bt_enable(BT_Init);
+  //err = bt_enable(BT_Init);
 
   if(err != 0)
   {
