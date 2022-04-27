@@ -188,6 +188,14 @@ extern void shutdnTimerCb(struct k_timer* timer_id)
   }
 }
 
+static void resetBufferIndex()
+{
+  nrf_timer_event_clear(NRF_TIMER3, NRF_TIMER_EVENT_COMPARE0);
+  nrf_timer_task_trigger(NRF_TIMER3, NRF_TIMER_TASK_CLEAR);
+  adcRawDataCnt = 0;
+  adcAvgDataCnt = 0;
+}
+
 static void adcSwitchBtn(void* p1, void* p2, void* p3)
 {
   uint8_t buttonCurrStatus = BUTTON_LOGIC;
@@ -200,6 +208,9 @@ static void adcSwitchBtn(void* p1, void* p2, void* p3)
 
     if((buttonPrevStatus != buttonCurrStatus) && (buttonCurrStatus == BUTTON_LOGIC))
     {
+      timerStopSampling();
+      k_sem_take(&bleSemaphor, K_NO_WAIT);
+
       // Switch between internal and external ADC. Interrupt
       if(isInternalAdc == 1)
       {
@@ -220,8 +231,8 @@ static void adcSwitchBtn(void* p1, void* p2, void* p3)
         isInternalAdc = 1;
       }
 
-      adcRawDataCnt = 0;
-      adcAvgDataCnt = 0;
+      resetBufferIndex();
+      nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_START);
     }
 
     buttonPrevStatus = buttonCurrStatus;
@@ -313,6 +324,9 @@ void BT_Connected(struct bt_conn* conn, uint8_t err)
 void BT_Disconnected(struct bt_conn* conn, uint8_t reason)
 {
   printk("BLE Disconnected.\n");
+  timerStopSampling();
+  k_sem_take(&bleSemaphor, K_NO_WAIT);
+  resetBufferIndex();
 }
 
 ssize_t ssstErrorSend(struct bt_conn* conn,
@@ -332,12 +346,12 @@ void ssst_ccc_cfg_changed(const struct bt_gatt_attr* attr, uint16_t value)
     // Stop reading data from sensor
     nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_STOP);
     k_sem_take(&bleSemaphor, K_NO_WAIT);
+    resetBufferIndex();
     break;
 
   case BT_GATT_CCC_NOTIFY:
     // Start reading data from sensor
     nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_START);
-    k_sem_give(&bleSemaphor);
     break;
 
   default:
@@ -354,17 +368,20 @@ static void BT_SendData(void* p1, void* p2, void* p3)
 
     k_sem_take(&bleSemaphor, K_FOREVER);
 
-    error = bt_gatt_notify(NULL, &ssst_svc.attrs[1], p_adcAvgData, AVG_DATA_SIZE * sizeof(uint16_t));
+    if(p_adcAvgData == adcAvgData1)
+    {
+      error = bt_gatt_notify(NULL, &ssst_svc.attrs[1], adcAvgData2, AVG_DATA_SIZE * sizeof(uint16_t));
+    }
+    else
+    {
+      error = bt_gatt_notify(NULL, &ssst_svc.attrs[1], adcAvgData1, AVG_DATA_SIZE * sizeof(uint16_t));
+    }
 
     if(error != 0)
     {
       printk("Error sending data.\n");
     }
   }
-}
-
-static void compressData(uint16_t* rawData, uint16_t* compressedData)
-{
 }
 
 static void LED_Init()
@@ -599,7 +616,6 @@ static void kernelInit()
   priority = 8;
   k_thread_create(&thr_blueTooth, stk_blueTooth, K_THREAD_STACK_SIZEOF(stk_blueTooth), BT_SendData, NULL, NULL, NULL, priority, 0, K_NO_WAIT);
   k_thread_name_set(&thr_blueTooth, "Bluetooth");
-  k_sem_take(&bleSemaphor, K_NO_WAIT);
 
   /* Init IRQs */
   priority = 5;

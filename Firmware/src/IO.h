@@ -36,5 +36,7 @@ void SAADC_EnableIntADC();
 void SAADC_DisableIntADC();
 void SAADC_EnableExtADC();
 void SAADC_DisableExtADC();
+void timerStopSampling();
+void timerStartSampling();
 
 #endif  //__IO_H
