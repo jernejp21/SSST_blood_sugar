@@ -2,18 +2,17 @@
  * SSST blood sugar. Device for contacless measuring of blood sugar.
  * Copyright (C) 2022  Azurtest
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #ifndef __CONFIG_H
@@ -24,32 +23,42 @@
 #define AVG_DATA_SIZE 100  // This will change after testing
 #define BTN_SHUTDN_DELAY 2500  // value in ms
 #define ADC_RESOLUTION 4096  // 12-bit resolution
-#define SAMPLING_RATE 10000  // 1000000/SAMPLING_RATE is samp. freq.
+#define SAMPLING_RATE 1000  // 1000000/SAMPLING_RATE is samp. freq.
 #define PIN_MAP(port, pin) (port * 32 + pin)
 
 /* HW defines. LEDs, Buttons etc. */
-#define BTN_SHUTDN PIN_MAP(0, 24)
-#define BTN_ADC_CHG PIN_MAP(0, 25)
-#define LED_STATUS PIN_MAP(0, 13)
-#define LED_BATT PIN_MAP(0, 14)
-#define DCDC_SHTDN_3V3 PIN_MAP(0, 3)
-#define DCDC_SHTDN_5V PIN_MAP(0, 28)
-#define AIN_BATT_SENS PIN_MAP(0, 29)
+#define BTN_SHUTDN PIN_MAP(0, 21)
+#define BTN_ADC_CHG PIN_MAP(0, 22)
+#define LED_STATUS PIN_MAP(0, 25)
+#define LED_BATT PIN_MAP(0, 24)
+#define DCDC_SHTDN_3V3 PIN_MAP(0, 13)
+#define DCDC_SHTDN_5V PIN_MAP(0, 29)
+#define AIN_BATT_SENS PIN_MAP(0, 3)
 #define AIN_BLOOD_SENS PIN_MAP(0, 4)
-#define SPI_SCK_PIN PIN_MAP(1, 8)
-#define SPI_MOSI_PIN PIN_MAP(1, 5)
-#define SPI_MISO_PIN PIN_MAP(1, 7)
-#define SPI_CS_PIN PIN_MAP(1, 6)
+#define SPI_SCK_PIN PIN_MAP(0, 19)
+#define SPI_MOSI_PIN PIN_MAP(0, 18)
+#define SPI_MISO_PIN PIN_MAP(0, 20)
+#define SPI_CS_PIN PIN_MAP(0, 17)
 
 /* HW configuration. LOW, HIGH logic etc. */
-#define BUTTON_POS_LOGIC 0  // Is button positve logic? Released LOW state, pressed HIGH state
-#define SUPPLY_VOLTAGE (3.0)
+//#define BUTTON_POS_LOGIC  // Is button positve logic? Released LOW state, pressed HIGH state
+#define SUPPLY_VOLTAGE (4.2)
 #define BATT_MIN_VOLT (SUPPLY_VOLTAGE * 12 / 16)  // Not actual voltage, but adjusted where full battery (about 4.2 V) is suppy voltage
 
-#if BUTTON_POS_LOGIC
-#define BUTTON_LOGIC 0
-#else
+#ifdef BUTTON_POS_LOGIC
 #define BUTTON_LOGIC 1
+#else
+#define BUTTON_LOGIC 0
 #endif
+
+/* Enums */
+
+enum
+{
+    ERROR_AMP = 1,
+    ERROR_ADC,
+    ERROR_OTH,
+    ERROR_NONE = 0xFF,
+};
 
 #endif  //__CONFIG

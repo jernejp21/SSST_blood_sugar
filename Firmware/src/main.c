@@ -1,32 +1,36 @@
-/*
+/**
  * Copyright (c) 2016 Intel Corporation
  *
  * SPDX-License-Identifier: Apache-2.0
  *
- *
  * SSST blood sugar. Device for contacless measuring of blood sugar.
  * Copyright (C) 2022  Azurtest
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+#define NRF_DEFAULT_IRQ_PRIORITY 5
 
 #include <device.h>
 #include <devicetree.h>
 #include <drivers/gpio.h>
 #include <zephyr.h>
 
+#include <bluetooth/bluetooth.h>
 #include <bluetooth/conn.h>
+#include <bluetooth/gatt.h>
+#include <bluetooth/hci.h>
+#include <bluetooth/uuid.h>
 #include <hal/nrf_gpio.h>
 #include <hal/nrf_lpcomp.h>
 #include <hal/nrf_power.h>
@@ -38,11 +42,20 @@
 #include "IO.h"
 #include "config.h"
 
+#define BT_UUID_SSST_SERVICE_VAL BT_UUID_128_ENCODE(0x0179bbd0, 0x5351, 0x48b5, 0xbf6d, 0x2167639bc867)
+#define BT_UUID_SSST_DATA_VAL BT_UUID_128_ENCODE(0x0179bbd1, 0x5351, 0x48b5, 0xbf6d, 0x2167639bc867)
+#define BT_UUID_SSST_ERROR_VAL BT_UUID_128_ENCODE(0x0179bbd2, 0x5351, 0x48b5, 0xbf6d, 0x2167639bc867)
+
+#define BT_UUID_SSST_SERVICE BT_UUID_DECLARE_128(BT_UUID_SSST_SERVICE_VAL)
+#define BT_UUID_SSST_DATA BT_UUID_DECLARE_128(BT_UUID_SSST_DATA_VAL)
+#define BT_UUID_SSST_ERROR BT_UUID_DECLARE_128(BT_UUID_SSST_ERROR_VAL)
+
 #define BUFFER_SIZE 3
 
 /* Variables */
 volatile uint8_t isInternalAdc;
 volatile uint8_t isLowBattery;
+volatile uint8_t isNotifyEnabled;
 static uint16_t adcAvgData1[AVG_DATA_SIZE];
 static uint16_t adcAvgData2[AVG_DATA_SIZE];
 static uint16_t adcRawData[RAW_DATA_SIZE] __attribute__((aligned(2)));
@@ -51,10 +64,10 @@ static uint8_t rx_buff[BUFFER_SIZE] __attribute__((aligned(2)));
 static uint8_t tx_buff[BUFFER_SIZE] __attribute__((aligned(2)));
 static uint32_t adcRawDataCnt;
 static uint32_t adcAvgDataCnt;
+static uint8_t errorStatus;
 
 /* Kernel variables */
 static uint8_t startShutdnTimer;
-static struct bt_conn_cb btConnectionCb;
 static struct k_timer shutdnTimer;
 static struct k_timer ledStartupBlink;
 
@@ -67,8 +80,38 @@ struct k_thread thr_heartBeat;
 K_THREAD_STACK_DEFINE(stk_blueTooth, 1024);
 struct k_thread thr_blueTooth;
 
-/* Functions */
+K_SEM_DEFINE(bleSemaphor, 0, 1);
 
+/* Bluetooth config */
+void BT_Connected(struct bt_conn*, uint8_t);
+void BT_Disconnected(struct bt_conn*, uint8_t);
+ssize_t ssstErrorSend(struct bt_conn*, const struct bt_gatt_attr*, void*, uint16_t, uint16_t);
+void ssst_ccc_cfg_changed(const struct bt_gatt_attr*, uint16_t);
+
+static const struct bt_data advert[] = {
+    BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR))};
+
+static const struct bt_data scan[] = {
+    BT_DATA_BYTES(BT_DATA_UUID128_ALL, BT_UUID_SSST_SERVICE_VAL)};
+
+BT_CONN_CB_DEFINE(conn_callbacks) = {
+    .connected = BT_Connected,
+    .disconnected = BT_Disconnected,
+};
+
+BT_GATT_SERVICE_DEFINE(ssst_svc,
+                       BT_GATT_PRIMARY_SERVICE(BT_UUID_SSST_SERVICE),
+                       BT_GATT_CHARACTERISTIC(BT_UUID_SSST_DATA,
+                                              BT_GATT_CHRC_NOTIFY,
+                                              BT_GATT_PERM_NONE,
+                                              NULL, NULL, NULL),
+                       BT_GATT_CCC(ssst_ccc_cfg_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+                       BT_GATT_CHARACTERISTIC(BT_UUID_SSST_ERROR,
+                                              BT_GATT_CHRC_READ,
+                                              BT_GATT_PERM_READ,
+                                              ssstErrorSend, NULL, NULL), );
+
+/* Functions */
 static void ledExtADCSelPattern()
 {
   LED_StatusOn();
@@ -146,6 +189,14 @@ extern void shutdnTimerCb(struct k_timer* timer_id)
   }
 }
 
+static void resetBufferIndex()
+{
+  nrf_timer_event_clear(NRF_TIMER3, NRF_TIMER_EVENT_COMPARE0);
+  nrf_timer_task_trigger(NRF_TIMER3, NRF_TIMER_TASK_CLEAR);
+  adcRawDataCnt = 0;
+  adcAvgDataCnt = 0;
+}
+
 static void adcSwitchBtn(void* p1, void* p2, void* p3)
 {
   uint8_t buttonCurrStatus = BUTTON_LOGIC;
@@ -158,6 +209,9 @@ static void adcSwitchBtn(void* p1, void* p2, void* p3)
 
     if((buttonPrevStatus != buttonCurrStatus) && (buttonCurrStatus == BUTTON_LOGIC))
     {
+      timerStopSampling();
+      k_sem_take(&bleSemaphor, K_NO_WAIT);
+
       // Switch between internal and external ADC. Interrupt
       if(isInternalAdc == 1)
       {
@@ -178,8 +232,11 @@ static void adcSwitchBtn(void* p1, void* p2, void* p3)
         isInternalAdc = 1;
       }
 
-      adcRawDataCnt = 0;
-      adcAvgDataCnt = 0;
+      resetBufferIndex();
+      if(isNotifyEnabled == 1)
+      {
+        nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_START);
+      }
     }
 
     buttonPrevStatus = buttonCurrStatus;
@@ -263,37 +320,74 @@ static void heartBeat(void* p1, void* p2, void* p3)
   }
 }
 
-static void BT_Connected(struct bt_conn* conn, uint8_t err)
+void BT_Connected(struct bt_conn* conn, uint8_t err)
 {
-  // Start ADC, EasyDMA
+  printk("BLE Connected.\n");
 }
 
-static void BT_Disconnected(struct bt_conn* conn, uint8_t reason)
+void BT_Disconnected(struct bt_conn* conn, uint8_t reason)
 {
-  // Stop ADC, EasyDMA
+  printk("BLE Disconnected.\n");
+  timerStopSampling();
+  k_sem_take(&bleSemaphor, K_NO_WAIT);
+  resetBufferIndex();
+}
+
+ssize_t ssstErrorSend(struct bt_conn* conn,
+                      const struct bt_gatt_attr* attr,
+                      void* buf,
+                      uint16_t len,
+                      uint16_t offset)
+{
+  return bt_gatt_attr_read(conn, attr, buf, len, offset, &errorStatus, sizeof(errorStatus));
+}
+
+void ssst_ccc_cfg_changed(const struct bt_gatt_attr* attr, uint16_t value)
+{
+  switch(value)
+  {
+  case 0:
+    // Stop reading data from sensor
+    nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_STOP);
+    k_sem_take(&bleSemaphor, K_NO_WAIT);
+    resetBufferIndex();
+    isNotifyEnabled = 0;
+    break;
+
+  case BT_GATT_CCC_NOTIFY:
+    // Start reading data from sensor
+    nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_START);
+    isNotifyEnabled = 1;
+    break;
+
+  default:
+    break;
+  }
 }
 
 static void BT_SendData(void* p1, void* p2, void* p3)
 {
-  // Send averaged and compressed data
-  uint32_t cnt = 0;
-  volatile uint32_t value = 1000000;
+  int error;
 
   while(1)
   {
-    while(cnt < value)
+
+    k_sem_take(&bleSemaphor, K_FOREVER);
+
+    if(p_adcAvgData == adcAvgData1)
     {
-      cnt++;
+      error = bt_gatt_notify(NULL, &ssst_svc.attrs[1], adcAvgData2, AVG_DATA_SIZE * sizeof(uint16_t));
+    }
+    else
+    {
+      error = bt_gatt_notify(NULL, &ssst_svc.attrs[1], adcAvgData1, AVG_DATA_SIZE * sizeof(uint16_t));
     }
 
-    cnt = 0;
-
-    k_thread_suspend(&thr_blueTooth);
+    if(error != 0)
+    {
+      printk("Error sending data.\n");
+    }
   }
-}
-
-static void compressData(uint16_t* rawData, uint16_t* compressedData)
-{
 }
 
 static void LED_Init()
@@ -306,8 +400,8 @@ static void LED_Init()
 
 static void BTN_Init()
 {
-  nrf_gpio_cfg_input(BTN_SHUTDN, NRF_GPIO_PIN_PULLUP);
-  nrf_gpio_cfg_input(BTN_ADC_CHG, NRF_GPIO_PIN_PULLUP);
+  nrf_gpio_cfg_input(BTN_SHUTDN, NRF_GPIO_PIN_NOPULL);
+  nrf_gpio_cfg_input(BTN_ADC_CHG, NRF_GPIO_PIN_NOPULL);
 }
 
 static void GPIO_Init()
@@ -321,16 +415,16 @@ static void GPIO_Init()
 static void TIMER_Init()
 {
   /* Init TIMER0 as timer */
-  nrf_timer_bit_width_set(NRF_TIMER0, NRF_TIMER_BIT_WIDTH_32);
-  nrf_timer_cc_set(NRF_TIMER0, NRF_TIMER_CC_CHANNEL0, SAMPLING_RATE);
-  nrf_timer_int_enable(NRF_TIMER0, NRF_TIMER_INT_COMPARE0_MASK);
-  nrf_timer_shorts_set(NRF_TIMER0, NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK);
+  nrf_timer_bit_width_set(NRF_TIMER2, NRF_TIMER_BIT_WIDTH_32);
+  nrf_timer_cc_set(NRF_TIMER2, NRF_TIMER_CC_CHANNEL0, SAMPLING_RATE);
+  nrf_timer_int_enable(NRF_TIMER2, NRF_TIMER_INT_COMPARE0_MASK);
+  nrf_timer_shorts_set(NRF_TIMER2, NRF_TIMER_SHORT_COMPARE0_CLEAR_MASK);
 
   /* Init TIMER1 as counter */
-  nrf_timer_mode_set(NRF_TIMER1, NRF_TIMER_MODE_LOW_POWER_COUNTER);
-  nrf_timer_bit_width_set(NRF_TIMER1, NRF_TIMER_BIT_WIDTH_8);
-  nrf_timer_cc_set(NRF_TIMER1, NRF_TIMER_CC_CHANNEL0, RAW_DATA_SIZE);
-  nrf_timer_int_enable(NRF_TIMER1, NRF_TIMER_INT_COMPARE0_MASK);
+  nrf_timer_mode_set(NRF_TIMER3, NRF_TIMER_MODE_LOW_POWER_COUNTER);
+  nrf_timer_bit_width_set(NRF_TIMER3, NRF_TIMER_BIT_WIDTH_8);
+  nrf_timer_cc_set(NRF_TIMER3, NRF_TIMER_CC_CHANNEL0, RAW_DATA_SIZE);
+  nrf_timer_int_enable(NRF_TIMER3, NRF_TIMER_INT_COMPARE0_MASK);
 }
 
 static void SPIM_Init()
@@ -372,7 +466,7 @@ static void LPCOMP_Init()
   config.hyst = NRF_LPCOMP_HYST_ENABLED;
 
   nrf_lpcomp_configure(NRF_LPCOMP, &config);
-  nrf_lpcomp_input_select(NRF_LPCOMP, NRF_LPCOMP_INPUT_5);
+  nrf_lpcomp_input_select(NRF_LPCOMP, NRF_LPCOMP_INPUT_1);
   nrf_lpcomp_int_enable(NRF_LPCOMP, NRF_LPCOMP_INT_CROSS_MASK);
   nrf_lpcomp_enable(NRF_LPCOMP);
   nrf_lpcomp_task_trigger(NRF_LPCOMP, NRF_LPCOMP_TASK_START);
@@ -380,6 +474,14 @@ static void LPCOMP_Init()
 
 static void BT_Init()
 {
+  int err;
+
+  err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, advert, ARRAY_SIZE(advert), NULL, 0);
+
+  if(err != 0)
+  {
+    printk("Couldn't start advertising. Error: %d\n", err);
+  }
 }
 
 static void adcSamplingIRQ(const void* arg)
@@ -402,6 +504,7 @@ static void adcSamplingIRQ(const void* arg)
     // ABS value
     uint16_t tmp;
     tmp = compoundData >> 15;
+    tmp = tmp ? 0xFFFF : 0;
     compoundData ^= tmp;
     compoundData += tmp & 1;
     adcRawData[adcRawDataCnt] = compoundData;
@@ -428,8 +531,8 @@ static void adcSamplingIRQ(const void* arg)
   }
 
   adcRawDataCnt++;
-  nrf_timer_task_trigger(NRF_TIMER1, NRF_TIMER_TASK_COUNT);
-  nrf_timer_event_clear(NRF_TIMER0, NRF_TIMER_EVENT_COMPARE0);
+  nrf_timer_task_trigger(NRF_TIMER3, NRF_TIMER_TASK_COUNT);
+  nrf_timer_event_clear(NRF_TIMER2, NRF_TIMER_EVENT_COMPARE0);
 }
 
 static void adcAvgIRQ(const void* arg)
@@ -438,8 +541,8 @@ static void adcAvgIRQ(const void* arg)
   // Called when EasyDMA is full. Currently is on 10 samples - 100 Hz.
 
   adcRawDataCnt = 0;
-  nrf_timer_event_clear(NRF_TIMER1, NRF_TIMER_EVENT_COMPARE0);
-  nrf_timer_task_trigger(NRF_TIMER1, NRF_TIMER_TASK_CLEAR);
+  nrf_timer_event_clear(NRF_TIMER3, NRF_TIMER_EVENT_COMPARE0);
+  nrf_timer_task_trigger(NRF_TIMER3, NRF_TIMER_TASK_CLEAR);
 
   p_adcAvgData[adcAvgDataCnt] = adcSampleAverage(adcRawData, RAW_DATA_SIZE);
   adcAvgDataCnt++;
@@ -447,7 +550,8 @@ static void adcAvgIRQ(const void* arg)
   if(adcAvgDataCnt == AVG_DATA_SIZE)
   {
     // Start BT transatction
-    // k_thread_resume(&thr_blueTooth);
+    k_sem_give(&bleSemaphor);
+
     // Change buffer
     if(p_adcAvgData == adcAvgData1)
     {
@@ -503,34 +607,33 @@ static void kernelInit()
   int priority;
 
   /* Init threads but don't start them yet. */
-  priority = 3;
+  priority = 6;
   k_thread_create(&thr_ShutDnBtn, stk_ShutDnBtn, K_THREAD_STACK_SIZEOF(stk_ShutDnBtn), shutDnBtn, NULL, NULL, NULL, priority, 0, K_MSEC(3000));
   k_thread_name_set(&thr_ShutDnBtn, "Shutdown button");
 
-  priority = 4;
+  priority = 7;
   k_thread_create(&thr_adcSwitchBtn, stk_adcSwitchBtn, K_THREAD_STACK_SIZEOF(stk_adcSwitchBtn), adcSwitchBtn, NULL, NULL, NULL, priority, 0, K_NO_WAIT);
   k_thread_name_set(&thr_adcSwitchBtn, "ADC switch button");
   k_thread_suspend(&thr_adcSwitchBtn);
 
-  priority = 5;
+  priority = 7;
   k_thread_create(&thr_heartBeat, stk_heartBeat, K_THREAD_STACK_SIZEOF(stk_heartBeat), heartBeat, NULL, NULL, NULL, priority, 0, K_MSEC(3040));
   k_thread_name_set(&thr_heartBeat, "Heartbeat");
 
-  priority = 6;
+  priority = 8;
   k_thread_create(&thr_blueTooth, stk_blueTooth, K_THREAD_STACK_SIZEOF(stk_blueTooth), BT_SendData, NULL, NULL, NULL, priority, 0, K_NO_WAIT);
   k_thread_name_set(&thr_blueTooth, "Bluetooth");
-  k_thread_suspend(&thr_blueTooth);
 
   /* Init IRQs */
-  priority = -15;
-  irq_connect_dynamic(TIMER0_IRQn, priority, adcSamplingIRQ, NULL, 0);
-  irq_enable(TIMER0_IRQn);
+  priority = 5;
+  irq_connect_dynamic(TIMER2_IRQn, priority, adcSamplingIRQ, NULL, 0);
+  irq_enable(TIMER2_IRQn);
 
-  priority = -14;
-  irq_connect_dynamic(TIMER1_IRQn, priority, adcAvgIRQ, NULL, 0);
-  irq_enable(TIMER1_IRQn);
+  priority = 5;
+  irq_connect_dynamic(TIMER3_IRQn, priority, adcAvgIRQ, NULL, 0);
+  irq_enable(TIMER3_IRQn);
 
-  priority = -13;
+  priority = 5;
   irq_connect_dynamic(LPCOMP_IRQn, priority, checkBattStatus, NULL, 0);
   irq_enable(LPCOMP_IRQn);
 
@@ -554,7 +657,7 @@ static void checkStartupBattery()
   config.resistor_n = NRF_SAADC_RESISTOR_DISABLED;
 
   nrf_saadc_channel_init(NRF_SAADC, 0, &config);
-  nrf_saadc_channel_input_set(NRF_SAADC, 0, NRF_SAADC_INPUT_AIN5, NRF_SAADC_INPUT_DISABLED);
+  nrf_saadc_channel_input_set(NRF_SAADC, 0, NRF_SAADC_INPUT_AIN1, NRF_SAADC_INPUT_DISABLED);
   nrf_saadc_buffer_init(NRF_SAADC, (int16_t*)rx_buff, 1);
   nrf_saadc_resolution_set(NRF_SAADC, NRF_SAADC_RESOLUTION_12BIT);
   nrf_saadc_enable(NRF_SAADC);
@@ -604,6 +707,8 @@ static void checkStartupBattery()
 
 void main(void)
 {
+  int err;
+
   /* System init */
   LED_Init();
   BTN_Init();
@@ -611,7 +716,6 @@ void main(void)
   TIMER_Init();
   SPIM_Init();
   LPCOMP_Init();
-  // BT_Init();
   kernelInit();
   /* End of system init */
 
@@ -621,8 +725,16 @@ void main(void)
 
   p_adcAvgData = adcAvgData1;
 
-  // Begin LED start-up complete sequence
+  /* Begin LED start-up complete sequence */
   k_timer_start(&ledStartupBlink, K_MSEC(100), K_MSEC(100));
+
+  /* Start BT advertising */
+  err = bt_enable(BT_Init);
+
+  if(err != 0)
+  {
+    printk("Couldn't enable BLE. Error: %d\n", err);
+  }
 
   // main is only for system init. Afterwards everyhing is done in threads.
 }

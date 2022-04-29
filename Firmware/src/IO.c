@@ -2,26 +2,25 @@
  * SSST blood sugar. Device for contacless measuring of blood sugar.
  * Copyright (C) 2022  Azurtest
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include "IO.h"
 #include "config.h"
 #include <hal/nrf_gpio.h>
 #include <hal/nrf_saadc.h>
-#include <hal/nrf_timer.h>
 #include <hal/nrf_spim.h>
+#include <hal/nrf_timer.h>
 
 void LED_StatusOn()
 {
@@ -85,18 +84,12 @@ void SAADC_EnableIntADC()
   // Enable SAADC and start it
   nrf_saadc_enable(NRF_SAADC);
   nrf_saadc_task_trigger(NRF_SAADC, NRF_SAADC_TASK_START);
-
-  // Start timer
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
 }
 
 void SAADC_DisableIntADC()
 {
   // Stop and clear timer
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_STOP);
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_CLEAR);
-  nrf_timer_event_clear(NRF_TIMER0, NRF_TIMER_EVENT_COMPARE0);
-  nrf_timer_task_trigger(NRF_TIMER1, NRF_TIMER_TASK_CLEAR);
+  timerStopSampling();
 
   // Disable SAADC EasyDMA interrupt
   nrf_saadc_disable(NRF_SAADC);
@@ -112,18 +105,12 @@ void SAADC_EnableExtADC()
 {
   // Enable SPI
   nrf_spim_enable(NRF_SPIM3);
-
-  // Start timer
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
 }
 
 void SAADC_DisableExtADC()
 {
   // Stop and clear timer
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_STOP);
-  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_CLEAR);
-  nrf_timer_event_clear(NRF_TIMER0, NRF_TIMER_EVENT_COMPARE0);
-  nrf_timer_task_trigger(NRF_TIMER1, NRF_TIMER_TASK_CLEAR);
+  timerStopSampling();
 
   // Disable SPI EasyDMA interrupt
   nrf_spim_disable(NRF_SPIM3);
@@ -132,4 +119,17 @@ void SAADC_DisableExtADC()
   nrf_spim_event_clear(NRF_SPIM3, NRF_SPIM_EVENT_END);
   nrf_spim_event_clear(NRF_SPIM3, NRF_SPIM_EVENT_ENDTX);
   nrf_spim_event_clear(NRF_SPIM3, NRF_SPIM_EVENT_STARTED);
+}
+
+void timerStopSampling()
+{
+  nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_STOP);
+  nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_CLEAR);
+  nrf_timer_event_clear(NRF_TIMER2, NRF_TIMER_EVENT_COMPARE0);
+  nrf_timer_task_trigger(NRF_TIMER3, NRF_TIMER_TASK_CLEAR);
+}
+
+void timerStartSampling()
+{
+  nrf_timer_task_trigger(NRF_TIMER0, NRF_TIMER_TASK_START);
 }
