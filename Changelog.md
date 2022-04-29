@@ -1,5 +1,23 @@
 # Changelog
 
+## [FW_v1](https://github.com/AZURTEST-CORP/SSST_blood_sugar/tree/FW_v1) (2022-04-29)
+
+[Full Changelog](https://github.com/AZURTEST-CORP/SSST_blood_sugar/compare/v0...FW_v1)
+
+**Implemented enhancements:**
+
+- Switching between external and internal ADC [\#19](https://github.com/AZURTEST-CORP/SSST_blood_sugar/issues/19)
+- Implement BLE streaming [\#2](https://github.com/AZURTEST-CORP/SSST_blood_sugar/issues/2)
+
+**Fixed bugs:**
+
+- ADC switching wile BLE not established [\#21](https://github.com/AZURTEST-CORP/SSST_blood_sugar/issues/21)
+- ABS value conversion not working [\#20](https://github.com/AZURTEST-CORP/SSST_blood_sugar/issues/20)
+
+**Merged pull requests:**
+
+- Milestone V1 [\#22](https://github.com/AZURTEST-CORP/SSST_blood_sugar/pull/22) ([jernejp21](https://github.com/jernejp21))
+
 ## [v0](https://github.com/AZURTEST-CORP/SSST_blood_sugar/tree/v0) (2022-04-07)
 
 [Full Changelog](https://github.com/AZURTEST-CORP/SSST_blood_sugar/compare/35cff00ba6ae8f5cf1055288acc48ba81a52e7a6...v0)
@@ -21,6 +39,11 @@
 **Closed issues:**
 
 - HW schematic [\#3](https://github.com/AZURTEST-CORP/SSST_blood_sugar/issues/3)
+
+**Merged pull requests:**
+
+- Merge of HW branch for milestone V0 [\#16](https://github.com/AZURTEST-CORP/SSST_blood_sugar/pull/16) ([jernejp21](https://github.com/jernejp21))
+- Merge of FW branch for milestone V0 [\#14](https://github.com/AZURTEST-CORP/SSST_blood_sugar/pull/14) ([jernejp21](https://github.com/jernejp21))
 
 
 
