@@ -1,4 +1,0 @@
-Layer Pairs Export File for PCB: \\192.168.1.124\home\1.client\Shinshu University\SSST\SSST_blood_sugar_git\Hardware\Altium\4Layer_Imposition.PcbDoc
-LayersSetName=Top_Bot_Plated_Thru_Holes|DrillFile=4layer_imposition-roundholes-plated.txt|DrillLayers=gtl,gp1,gp2,gbl
-LayersSetName=Top_Bot_Plated_Slot_Holes|DrillFile=4layer_imposition-slotholes-plated.txt|DrillLayers=gtl,gp1,gp2,gbl
-LayersSetName=Top_Bot_NonPlated_Thru_Holes|DrillFile=4layer_imposition-roundholes-nonplated.txt|DrillLayers=gtl,gp1,gp2,gbl
