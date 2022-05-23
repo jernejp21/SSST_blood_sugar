@@ -1,5 +1,18 @@
 # Changelog
 
+## [HW_v1](https://github.com/AZURTEST-CORP/SSST_blood_sugar/tree/HW_v1) (2022-05-23)
+
+[Full Changelog](https://github.com/AZURTEST-CORP/SSST_blood_sugar/compare/FW_v1...HW_v1)
+
+**Closed issues:**
+
+- Two V1 schematics [\#18](https://github.com/AZURTEST-CORP/SSST_blood_sugar/issues/18)
+- Case for PCB [\#17](https://github.com/AZURTEST-CORP/SSST_blood_sugar/issues/17)
+
+**Merged pull requests:**
+
+- HW version 1 [\#27](https://github.com/AZURTEST-CORP/SSST_blood_sugar/pull/27) ([jernejp21](https://github.com/jernejp21))
+
 ## [FW_v1](https://github.com/AZURTEST-CORP/SSST_blood_sugar/tree/FW_v1) (2022-04-29)
 
 [Full Changelog](https://github.com/AZURTEST-CORP/SSST_blood_sugar/compare/v0...FW_v1)
