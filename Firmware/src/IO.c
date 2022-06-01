@@ -126,8 +126,8 @@ void SAADC_DisableExtADC()
   timerStopSampling();
 
   // Shut down external ADC.
-  nrf_spim_rx_buffer_set(NRF_SPIM3, &status, 1);
-  nrf_spim_tx_buffer_set(NRF_SPIM3, &status, 1);
+  nrf_spim_rx_buffer_set(NRF_SPIM3, (uint8_t*)&status, 1);
+  nrf_spim_tx_buffer_set(NRF_SPIM3, (uint8_t*)&status, 1);
   nrf_spim_task_trigger(NRF_SPIM3, NRF_SPIM_TASK_START);
   do
   {

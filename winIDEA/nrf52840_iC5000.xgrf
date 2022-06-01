@@ -8,7 +8,7 @@
       <VersionLow>1</VersionLow>
      </REG_HEADER>
      <REG_ROOT>
-      <RegVer>1296220160</RegVer>
+      <RegVer>1296396288</RegVer>
       <EditorPersist>
        <EditorPersist>
         <__.0>
@@ -29,47 +29,55 @@
         </__.1>
         <__.10>
          <BookmarkList></BookmarkList>
+         <CaretPos>1593</CaretPos>
+         <Encoding>1</Encoding>
+         <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\cortex_m\reset.S</FileName>
+         <FileType>0</FileType>
+         <ScrollPos>46</ScrollPos>
+        </__.10>
+        <__.11>
+         <BookmarkList></BookmarkList>
          <CaretPos>2439</CaretPos>
          <Encoding>1</Encoding>
          <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\cortex_m\exc_exit.S</FileName>
          <FileType>0</FileType>
          <ScrollPos>57</ScrollPos>
-        </__.10>
-        <__.11>
+        </__.11>
+        <__.12>
          <BookmarkList></BookmarkList>
          <CaretPos>1496</CaretPos>
          <Encoding>1</Encoding>
          <FileName>D:\Projects\SSST_blood_sugar\Firmware\src\IO.c</FileName>
          <FileType>1</FileType>
          <ScrollPos>33</ScrollPos>
-        </__.11>
-        <__.12>
+        </__.12>
+        <__.13>
          <BookmarkList></BookmarkList>
          <CaretPos>1228</CaretPos>
          <Encoding>1</Encoding>
          <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\include\kernel.h</FileName>
          <FileType>1</FileType>
          <ScrollPos>51</ScrollPos>
-        </__.12>
-        <__.13>
+        </__.13>
+        <__.14>
          <BookmarkList></BookmarkList>
          <CaretPos>15431</CaretPos>
          <Encoding>1</Encoding>
          <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\kernel\sched.c</FileName>
          <FileType>1</FileType>
          <ScrollPos>548</ScrollPos>
-        </__.13>
-        <__.14>
+        </__.14>
+        <__.15>
          <BookmarkList></BookmarkList>
          <CaretPos>3151</CaretPos>
          <Encoding>1</Encoding>
          <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\include\sys\time_units.h</FileName>
          <FileType>1</FileType>
          <ScrollPos>78</ScrollPos>
-        </__.14>
+        </__.15>
         <__.2>
          <BookmarkList></BookmarkList>
-         <CaretPos>8524</CaretPos>
+         <CaretPos>9825</CaretPos>
          <Encoding>1</Encoding>
          <FileName>D:\Projects\SSST_blood_sugar\Firmware\src\main.c</FileName>
          <FileType>1</FileType>
@@ -93,43 +101,43 @@
         </__.4>
         <__.5>
          <BookmarkList></BookmarkList>
+         <CaretPos>2288</CaretPos>
+         <Encoding>1</Encoding>
+         <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\cortex_m\fault_s.S</FileName>
+         <FileType>0</FileType>
+         <ScrollPos>38</ScrollPos>
+        </__.5>
+        <__.6>
+         <BookmarkList></BookmarkList>
          <CaretPos>936</CaretPos>
          <Encoding>1</Encoding>
          <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\lib\os\thread_entry.c</FileName>
          <FileType>1</FileType>
          <ScrollPos>0</ScrollPos>
-        </__.5>
-        <__.6>
+        </__.6>
+        <__.7>
          <BookmarkList></BookmarkList>
          <CaretPos>7367</CaretPos>
          <Encoding>1</Encoding>
          <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\isr_wrapper.S</FileName>
          <FileType>0</FileType>
          <ScrollPos>228</ScrollPos>
-        </__.6>
-        <__.7>
+        </__.7>
+        <__.8>
          <BookmarkList></BookmarkList>
          <CaretPos>18816</CaretPos>
          <Encoding>1</Encoding>
          <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\thread.c</FileName>
          <FileType>1</FileType>
          <ScrollPos>490</ScrollPos>
-        </__.7>
-        <__.8>
+        </__.8>
+        <__.9>
          <BookmarkList></BookmarkList>
          <CaretPos>2008</CaretPos>
          <Encoding>1</Encoding>
          <FileName>Z:\home\jernej\Projects\SSST_blood_sugar\Firmware\src\main.c</FileName>
          <FileType>1</FileType>
          <ScrollPos>81</ScrollPos>
-        </__.8>
-        <__.9>
-         <BookmarkList></BookmarkList>
-         <CaretPos>2080</CaretPos>
-         <Encoding>1</Encoding>
-         <FileName>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\cortex_m\reset.S</FileName>
-         <FileType>0</FileType>
-         <ScrollPos>46</ScrollPos>
         </__.9>
        </EditorPersist>
       </EditorPersist>
@@ -144,7 +152,7 @@
       <VersionLow>1</VersionLow>
      </REG_HEADER>
      <REG_ROOT>
-      <RegVer>1296220160</RegVer>
+      <RegVer>1296396288</RegVer>
       <ANGUIData.0>
        <Filetime type="B">FOMOCPLGBEDINIAB</Filetime>
        <GUID type="B">BPEJLJIBMCODFOEBIBPPDKDJPDGLECMK</GUID>
@@ -519,7 +527,7 @@
        </ProfilerData>
       </ANGUIData.0>
       <ANGUIData.1>
-       <Filetime type="B">EBCEDMEHNADPNIAB</Filetime>
+       <Filetime type="B">AAMKPGBGFGHFNIAB</Filetime>
        <GUID type="B">FIMAJONBPGNCGBEKJGCKHPMMCFONAHPB</GUID>
        <CVData>
         <Columns>
@@ -579,11 +587,11 @@
          <PrimaryDocumentPaneId>-1</PrimaryDocumentPaneId>
          <Frames>
           <__.0>
-           <FocusedViewId>4</FocusedViewId>
+           <FocusedViewId>2</FocusedViewId>
            <FrameState>9</FrameState>
            <IsPrimary>true</IsPrimary>
            <Bounds>
-            <Bottom>659</Bottom>
+            <Bottom>749</Bottom>
             <Left>0</Left>
             <Right>1192</Right>
             <Top>0</Top>
@@ -600,7 +608,7 @@
             <Children>
              <__.0>
               <DockType>View</DockType>
-              <Extent>0.5</Extent>
+              <Extent>0.54179</Extent>
               <IsDocumentPane>false</IsDocumentPane>
               <IsPinned>false</IsPinned>
               <IsTabbed>false</IsTabbed>
@@ -610,13 +618,13 @@
              </__.0>
              <__.1>
               <DockType>View</DockType>
-              <Extent>0.5</Extent>
+              <Extent>0.45821</Extent>
               <IsDocumentPane>false</IsDocumentPane>
               <IsPinned>false</IsPinned>
               <IsTabbed>false</IsTabbed>
               <Orientation>Horizontal</Orientation>
               <TopTabViewId>-1</TopTabViewId>
-              <ViewId>4</ViewId>
+              <ViewId>5</ViewId>
              </__.1>
             </Children>
            </Dock>
@@ -685,7 +693,7 @@
              <__.0>
               <Pos>0</Pos>
               <Visible>true</Visible>
-              <Width>120</Width>
+              <Width>202</Width>
              </__.0>
              <__.1>
               <Pos>0</Pos>
@@ -714,8 +722,8 @@
              </__.13>
              <__.14>
               <Pos>0</Pos>
-              <Visible>false</Visible>
-              <Width>120</Width>
+              <Visible>true</Visible>
+              <Width>166</Width>
              </__.14>
              <__.15>
               <Pos>0</Pos>
@@ -809,11 +817,11 @@
         </StatisticsViews>
         <TimelineViews>
          <__.0>
-          <ScrollPosition>0</ScrollPosition>
+          <ScrollPosition>743472205</ScrollPosition>
           <SnapOnFindEvent>true</SnapOnFindEvent>
-          <TimeLeft>0</TimeLeft>
-          <TimeRight>10167662681</TimeRight>
-          <ZoomLevel>10839726</ZoomLevel>
+          <TimeLeft>67875670</TimeLeft>
+          <TimeRight>5033530221</TimeRight>
+          <ZoomLevel>2000000</ZoomLevel>
           <ViewData>
            <CurrentApplicationIndex>0</CurrentApplicationIndex>
            <CurrentContextIndex>65535</CurrentContextIndex>
@@ -876,74 +884,6 @@
            </Pane>
           </ViewData>
          </__.0>
-         <__.1>
-          <ScrollPosition>0</ScrollPosition>
-          <SnapOnFindEvent>true</SnapOnFindEvent>
-          <TimeLeft>0</TimeLeft>
-          <TimeRight>10167662681</TimeRight>
-          <ZoomLevel>1</ZoomLevel>
-          <ViewData>
-           <CurrentApplicationIndex>0</CurrentApplicationIndex>
-           <CurrentContextIndex>65535</CurrentContextIndex>
-           <HideAreasWithNoActivity>false</HideAreasWithNoActivity>
-           <ViewTitle>Profiler Timeline</ViewTitle>
-           <Pane>
-            <Areas.areaAux>
-             <Height>0</Height>
-             <Filter>
-              <ShowChildItems>false</ShowChildItems>
-              <Text></Text>
-              <Visible>false</Visible>
-             </Filter>
-             <Sort>
-              <Column>0</Column>
-              <Direction>Ascending</Direction>
-             </Sort>
-            </Areas.areaAux>
-            <Areas.areaCode>
-             <Height>50</Height>
-             <Filter>
-              <ShowChildItems>false</ShowChildItems>
-              <Text></Text>
-              <Visible>false</Visible>
-             </Filter>
-             <Sort>
-              <Column>0</Column>
-              <Direction>Ascending</Direction>
-             </Sort>
-            </Areas.areaCode>
-            <Areas.areaData>
-             <Height>50</Height>
-             <Filter>
-              <ShowChildItems>false</ShowChildItems>
-              <Text></Text>
-              <Visible>false</Visible>
-             </Filter>
-             <Sort>
-              <Column>0</Column>
-              <Direction>Ascending</Direction>
-             </Sort>
-            </Areas.areaData>
-            <ColumnWidths>
-             <__.0>
-              <Pos>0</Pos>
-              <Visible>true</Visible>
-              <Width>150</Width>
-             </__.0>
-             <__.1>
-              <Pos>0</Pos>
-              <Visible>true</Visible>
-              <Width>40</Width>
-             </__.1>
-             <__.2>
-              <Pos>0</Pos>
-              <Visible>true</Visible>
-              <Width>800</Width>
-             </__.2>
-            </ColumnWidths>
-           </Pane>
-          </ViewData>
-         </__.1>
         </TimelineViews>
         <ViewData>
          <__.0>
@@ -952,9 +892,9 @@
           <ViewType>Timeline</ViewType>
          </__.0>
          <__.1>
-          <DataIndex>1</DataIndex>
-          <ViewId>4</ViewId>
-          <ViewType>Timeline</ViewType>
+          <DataIndex>0</DataIndex>
+          <ViewId>5</ViewId>
+          <ViewType>GlobalStatistics</ViewType>
          </__.1>
         </ViewData>
        </ProfilerData>
@@ -970,7 +910,7 @@
     <VersionLow>1</VersionLow>
    </REG_HEADER>
    <REG_ROOT>
-    <RegVer>1296220160</RegVer>
+    <RegVer>1296396288</RegVer>
     <DesktopLayout>
      <FileHistory>
       <FileHistoryEntries>
@@ -1028,21 +968,25 @@
         <ViewType>Document</ViewType>
        </__.12>
        <__.13>
-        <ViewId>2</ViewId>
-        <ViewType>Output_Progress</ViewType>
-       </__.13>
-       <__.14>
-        <ViewId>1</ViewId>
-        <ViewType>Symbols</ViewType>
-       </__.14>
-       <__.15>
         <ViewId>21</ViewId>
         <ViewType>Document</ViewType>
-       </__.15>
-       <__.16>
+       </__.13>
+       <__.14>
         <ViewId>23</ViewId>
         <ViewType>Document</ViewType>
+       </__.14>
+       <__.15>
+        <ViewId>2</ViewId>
+        <ViewType>Output_Progress</ViewType>
+       </__.15>
+       <__.16>
+        <ViewId>1</ViewId>
+        <ViewType>Symbols</ViewType>
        </__.16>
+       <__.17>
+        <ViewId>24</ViewId>
+        <ViewType>Document</ViewType>
+       </__.17>
        <__.2>
         <ViewId>3</ViewId>
         <ViewType>Locals</ViewType>
@@ -1110,6 +1054,11 @@
         <ViewId>13</ViewId>
         <ViewType>Document</ViewType>
        </__.1>
+       <__.10>
+        <RelativePath>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\cortex_m\fault_s.S</RelativePath>
+        <ViewId>24</ViewId>
+        <ViewType>Document</ViewType>
+       </__.10>
        <__.2>
         <RelativePath>C:\Users\jernej\ncs\v1.9.0\zephyr\arch\arm\core\aarch32\isr_wrapper.S</RelativePath>
         <ViewId>14</ViewId>
@@ -1311,7 +1260,7 @@
           <Options>0</Options>
           <ChildItems>
            <__.0>
-            <Name>SAADC</Name>
+            <Name>LPCOMP</Name>
             <Options>4</Options>
            </__.0>
           </ChildItems>
@@ -1323,10 +1272,64 @@
        <__.0>
         <ViewId>3</ViewId>
         <ViewType>Locals</ViewType>
+        <ColumnData>
+         <__.0>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>180</Width>
+         </__.0>
+         <__.1>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>80</Width>
+         </__.1>
+         <__.2>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>80</Width>
+         </__.2>
+         <__.3>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>140</Width>
+         </__.3>
+         <__.4>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>400</Width>
+         </__.4>
+        </ColumnData>
        </__.0>
        <__.1>
         <ViewId>4</ViewId>
         <ViewType>This</ViewType>
+        <ColumnData>
+         <__.0>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>180</Width>
+         </__.0>
+         <__.1>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>80</Width>
+         </__.1>
+         <__.2>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>80</Width>
+         </__.2>
+         <__.3>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>140</Width>
+         </__.3>
+         <__.4>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>400</Width>
+         </__.4>
+        </ColumnData>
        </__.1>
       </VariableViews>
       <WatchViews>
@@ -1334,6 +1337,33 @@
         <Name>Watch</Name>
         <ViewId>5</ViewId>
         <ViewType>CustomWatch</ViewType>
+        <ColumnData>
+         <__.0>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>180</Width>
+         </__.0>
+         <__.1>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>80</Width>
+         </__.1>
+         <__.2>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>80</Width>
+         </__.2>
+         <__.3>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>140</Width>
+         </__.3>
+         <__.4>
+          <Pos>0</Pos>
+          <Visible>true</Visible>
+          <Width>400</Width>
+         </__.4>
+        </ColumnData>
         <WatchData>
          <MiscData>
           <InitScript></InitScript>
@@ -1351,13 +1381,13 @@
           <InitScript></InitScript>
          </PaneMiscData.3>
          <VariableData>
-          <IsRealTimeEnabled>false</IsRealTimeEnabled>
+          <IsRealTimeEnabled>true</IsRealTimeEnabled>
           <Variables>
            <__.0>
-            <Name>buttonThreadID</Name>
+            <Name>isLowBattery</Name>
             <ExpressionDisplay>
              <Color>false</Color>
-             <ColorBack>16777215</ColorBack>
+             <ColorBack>16769216</ColorBack>
              <ColorText>0</ColorText>
              <Enabled>false</Enabled>
              <Hi>0</Hi>
@@ -1366,10 +1396,10 @@
             </ExpressionDisplay>
            </__.0>
            <__.1>
-            <Name>thr_ShutDnBtn</Name>
+            <Name>isInternalAdc</Name>
             <ExpressionDisplay>
              <Color>false</Color>
-             <ColorBack>16777215</ColorBack>
+             <ColorBack>16769216</ColorBack>
              <ColorText>0</ColorText>
              <Enabled>false</Enabled>
              <Hi>0</Hi>
@@ -1377,18 +1407,6 @@
              <Scale>Linear</Scale>
             </ExpressionDisplay>
            </__.1>
-           <__.2>
-            <Name>shutdnTimer</Name>
-            <ExpressionDisplay>
-             <Color>false</Color>
-             <ColorBack>16777215</ColorBack>
-             <ColorText>0</ColorText>
-             <Enabled>false</Enabled>
-             <Hi>0</Hi>
-             <Lo>0</Lo>
-             <Scale>Linear</Scale>
-            </ExpressionDisplay>
-           </__.2>
           </Variables>
          </VariableData>
          <WatchPaneData.0>
@@ -1496,14 +1514,14 @@
       <PrimaryDocumentPaneId>7</PrimaryDocumentPaneId>
       <Frames>
        <__.0>
-        <FocusedViewId>21</FocusedViewId>
+        <FocusedViewId>5</FocusedViewId>
         <FrameState>3</FrameState>
         <IsPrimary>true</IsPrimary>
         <Bounds>
-         <Bottom>844</Bottom>
-         <Left>784</Left>
-         <Right>1808</Right>
-         <Top>76</Top>
+         <Bottom>881</Bottom>
+         <Left>2020</Left>
+         <Right>3044</Right>
+         <Top>113</Top>
         </Bounds>
         <Dock>
          <DockType>None</DockType>
@@ -1574,7 +1592,7 @@
                <IsPinned>false</IsPinned>
                <IsTabbed>true</IsTabbed>
                <Orientation>None</Orientation>
-               <TopTabViewId>21</TopTabViewId>
+               <TopTabViewId>13</TopTabViewId>
                <ViewId>-1</ViewId>
                <Children>
                 <__.0>
@@ -1597,6 +1615,16 @@
                  <TopTabViewId>-1</TopTabViewId>
                  <ViewId>13</ViewId>
                 </__.1>
+                <__.10>
+                 <DockType>Document</DockType>
+                 <Extent>1</Extent>
+                 <IsDocumentPane>false</IsDocumentPane>
+                 <IsPinned>false</IsPinned>
+                 <IsTabbed>false</IsTabbed>
+                 <Orientation>None</Orientation>
+                 <TopTabViewId>-1</TopTabViewId>
+                 <ViewId>24</ViewId>
+                </__.10>
                 <__.2>
                  <DockType>Document</DockType>
                  <Extent>1</Extent>
@@ -1776,10 +1804,6 @@
       </FindInFilesDialogData>
      </GlobalData>
      <History>
-      <ComboBox>
-       <ComboBoxes>
-       </ComboBoxes>
-      </ComboBox>
      </History>
      <Options>
       <CallstackWindow>
