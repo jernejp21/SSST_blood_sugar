@@ -101,16 +101,38 @@ void SAADC_DisableIntADC()
   nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_STOPPED);
 }
 
-void SAADC_EnableExtADC()
+void SAADC_EnableExtADC(uint8_t* rx_buffer, uint8_t* tx_buffer, uint8_t buffer_size)
 {
+  int status;
+
   // Enable SPI
   nrf_spim_enable(NRF_SPIM3);
+
+  nrf_spim_rx_buffer_set(NRF_SPIM3, rx_buffer, buffer_size);
+  nrf_spim_tx_buffer_set(NRF_SPIM3, tx_buffer, buffer_size);
+  nrf_spim_task_trigger(NRF_SPIM3, NRF_SPIM_TASK_START);
+  do
+  {
+    status = nrf_spim_event_check(NRF_SPIM3, NRF_SPIM_EVENT_END);
+  } while(status == 0);
+  nrf_spim_event_clear(NRF_SPIM3, NRF_SPIM_EVENT_END);
 }
 
 void SAADC_DisableExtADC()
 {
+  int status = 0;
+
   // Stop and clear timer
   timerStopSampling();
+
+  // Shut down external ADC.
+  nrf_spim_rx_buffer_set(NRF_SPIM3, &status, 1);
+  nrf_spim_tx_buffer_set(NRF_SPIM3, &status, 1);
+  nrf_spim_task_trigger(NRF_SPIM3, NRF_SPIM_TASK_START);
+  do
+  {
+    status = nrf_spim_event_check(NRF_SPIM3, NRF_SPIM_EVENT_END);
+  } while(status == 0);
 
   // Disable SPI EasyDMA interrupt
   nrf_spim_disable(NRF_SPIM3);

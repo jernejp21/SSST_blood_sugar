@@ -218,7 +218,7 @@ static void adcSwitchBtn(void* p1, void* p2, void* p3)
         // Switch to external ADC
         SAADC_DisableIntADC();
         ledExtADCSelPattern();
-        SAADC_EnableExtADC();
+        SAADC_EnableExtADC(rx_buff, tx_buff, BUFFER_SIZE);
 
         isInternalAdc = 0;
       }
@@ -322,12 +322,10 @@ static void heartBeat(void* p1, void* p2, void* p3)
 
 void BT_Connected(struct bt_conn* conn, uint8_t err)
 {
-  printk("BLE Connected.\n");
 }
 
 void BT_Disconnected(struct bt_conn* conn, uint8_t reason)
 {
-  printk("BLE Disconnected.\n");
   timerStopSampling();
   k_sem_take(&bleSemaphor, K_NO_WAIT);
   resetBufferIndex();
@@ -381,11 +379,6 @@ static void BT_SendData(void* p1, void* p2, void* p3)
     else
     {
       error = bt_gatt_notify(NULL, &ssst_svc.attrs[1], adcAvgData1, AVG_DATA_SIZE * sizeof(uint16_t));
-    }
-
-    if(error != 0)
-    {
-      printk("Error sending data.\n");
     }
   }
 }
@@ -477,11 +470,6 @@ static void BT_Init()
   int err;
 
   err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, advert, ARRAY_SIZE(advert), NULL, 0);
-
-  if(err != 0)
-  {
-    printk("Couldn't start advertising. Error: %d\n", err);
-  }
 }
 
 static void adcSamplingIRQ(const void* arg)
@@ -591,7 +579,7 @@ static void checkBattStatus(const void* arg)
     }
     else
     {
-      SAADC_EnableExtADC();
+      SAADC_EnableExtADC(rx_buff, tx_buff, BUFFER_SIZE);
     }
 
     k_thread_resume(&thr_adcSwitchBtn);
@@ -607,11 +595,11 @@ static void kernelInit()
   int priority;
 
   /* Init threads but don't start them yet. */
-  priority = 6;
+  priority = 5;
   k_thread_create(&thr_ShutDnBtn, stk_ShutDnBtn, K_THREAD_STACK_SIZEOF(stk_ShutDnBtn), shutDnBtn, NULL, NULL, NULL, priority, 0, K_MSEC(3000));
   k_thread_name_set(&thr_ShutDnBtn, "Shutdown button");
 
-  priority = 7;
+  priority = 6;
   k_thread_create(&thr_adcSwitchBtn, stk_adcSwitchBtn, K_THREAD_STACK_SIZEOF(stk_adcSwitchBtn), adcSwitchBtn, NULL, NULL, NULL, priority, 0, K_NO_WAIT);
   k_thread_name_set(&thr_adcSwitchBtn, "ADC switch button");
   k_thread_suspend(&thr_adcSwitchBtn);
@@ -625,15 +613,15 @@ static void kernelInit()
   k_thread_name_set(&thr_blueTooth, "Bluetooth");
 
   /* Init IRQs */
-  priority = 5;
+  priority = -3;
   irq_connect_dynamic(TIMER2_IRQn, priority, adcSamplingIRQ, NULL, 0);
   irq_enable(TIMER2_IRQn);
 
-  priority = 5;
+  priority = -2;
   irq_connect_dynamic(TIMER3_IRQn, priority, adcAvgIRQ, NULL, 0);
   irq_enable(TIMER3_IRQn);
 
-  priority = 5;
+  priority = -4;
   irq_connect_dynamic(LPCOMP_IRQn, priority, checkBattStatus, NULL, 0);
   irq_enable(LPCOMP_IRQn);
 
@@ -691,7 +679,7 @@ static void checkStartupBattery()
     isInternalAdc = 0;
     isLowBattery = 0;
     SAADC_DisableIntADC();
-    SAADC_EnableExtADC();
+    SAADC_EnableExtADC(rx_buff, tx_buff, BUFFER_SIZE);
     k_thread_resume(&thr_adcSwitchBtn);
   }
   else
@@ -730,11 +718,6 @@ void main(void)
 
   /* Start BT advertising */
   err = bt_enable(BT_Init);
-
-  if(err != 0)
-  {
-    printk("Couldn't enable BLE. Error: %d\n", err);
-  }
 
   // main is only for system init. Afterwards everyhing is done in threads.
 }
