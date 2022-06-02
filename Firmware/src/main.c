@@ -85,8 +85,8 @@ K_SEM_DEFINE(bleSemaphor, 0, 1);
 /* Bluetooth config */
 void BT_Connected(struct bt_conn*, uint8_t);
 void BT_Disconnected(struct bt_conn*, uint8_t);
-ssize_t ssstStatusSend(struct bt_conn*, const struct bt_gatt_attr*, void*, uint16_t, uint16_t);
-void ssst_ccc_cfg_changed(const struct bt_gatt_attr*, uint16_t);
+ssize_t ssstStatusSend(struct bt_conn* conn, const struct bt_gatt_attr* attr, void* buf, uint16_t len, uint16_t offset);
+ssize_t ssstDataRead(struct bt_conn* conn, const struct bt_gatt_attr* attr, const void* buf, uint16_t len, uint16_t offset, uint8_t flags);
 
 static const struct bt_data advert[] = {
     BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR))};
@@ -99,10 +99,10 @@ BT_CONN_CB_DEFINE(conn_callbacks) = {
 BT_GATT_SERVICE_DEFINE(ssst_svc,
                        BT_GATT_PRIMARY_SERVICE(BT_UUID_SSST_SERVICE),
                        BT_GATT_CHARACTERISTIC(BT_UUID_SSST_DATA,
-                                              BT_GATT_CHRC_NOTIFY,
-                                              BT_GATT_PERM_NONE,
-                                              NULL, NULL, NULL),
-                       BT_GATT_CCC(ssst_ccc_cfg_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+                                              BT_GATT_CHRC_NOTIFY | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
+                                              BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+                                              NULL, ssstDataRead, NULL),
+                       BT_GATT_CCC(NULL, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
                        BT_GATT_CHARACTERISTIC(BT_UUID_SSST_STATUS,
                                               BT_GATT_CHRC_READ,
                                               BT_GATT_PERM_READ,
@@ -339,27 +339,40 @@ ssize_t ssstStatusSend(struct bt_conn* conn,
   return bt_gatt_attr_read(conn, attr, buf, len, offset, &statusFlags, sizeof(statusFlags));
 }
 
-void ssst_ccc_cfg_changed(const struct bt_gatt_attr* attr, uint16_t value)
+ssize_t ssstDataRead(struct bt_conn* conn,
+                     const struct bt_gatt_attr* attr,
+                     const void* buf,
+                     uint16_t len,
+                     uint16_t offset,
+                     uint8_t flags)
 {
-  switch(value)
+  const uint8_t* buf_val = buf;
+  // Reverse byte order, to send the correct message value.
+  uint16_t command = (buf_val[1] << 8) | buf_val[0];
+
+  switch(command)
   {
-  case 0:
+  case 0x11AA:
+    // Start reading data from sensor
+    nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_START);
+    isNotifyEnabled = 1;
+    bt_gatt_notify(NULL, &ssst_svc.attrs[1], &command, sizeof(command));
+    break;
+
+  case 0x12AA:
     // Stop reading data from sensor
     nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_STOP);
     k_sem_take(&bleSemaphor, K_NO_WAIT);
     resetBufferIndex();
     isNotifyEnabled = 0;
-    break;
-
-  case BT_GATT_CCC_NOTIFY:
-    // Start reading data from sensor
-    nrf_timer_task_trigger(NRF_TIMER2, NRF_TIMER_TASK_START);
-    isNotifyEnabled = 1;
+    bt_gatt_notify(NULL, &ssst_svc.attrs[1], &command, sizeof(command));
     break;
 
   default:
     break;
   }
+
+  return 0;
 }
 
 static void BT_SendData(void* p1, void* p2, void* p3)
