@@ -507,7 +507,7 @@ static void adcSamplingIRQ(const void* arg)
     tmp = tmp ? 0xFFFF : 0;
     compoundData ^= tmp;
     compoundData += tmp & 1;
-    adcRawData[adcRawDataCnt] = compoundData;
+    adcRawData[adcRawDataCnt] = compoundData << 4;  // This is 12-bit data. Shift 4 bits to left to get full-scale 16-bit.
 
     nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_STARTED);
     nrf_saadc_event_clear(NRF_SAADC, NRF_SAADC_EVENT_END);
@@ -618,7 +618,7 @@ static void kernelInit()
   k_thread_name_set(&thr_adcSwitchBtn, "ADC switch button");
   k_thread_suspend(&thr_adcSwitchBtn);
 
-  priority = 7;
+  priority = 15;
   k_thread_create(&thr_heartBeat, stk_heartBeat, K_THREAD_STACK_SIZEOF(stk_heartBeat), heartBeat, NULL, NULL, NULL, priority, 0, K_MSEC(3040));
   k_thread_name_set(&thr_heartBeat, "Heartbeat");
 
