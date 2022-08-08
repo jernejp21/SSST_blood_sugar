@@ -281,6 +281,7 @@ static void shutDnBtn(void* p1, void* p2, void* p3)
 static uint16_t adcSampleAverage(uint16_t* array, size_t size)
 {
   uint32_t avg = 0;
+  uint8_t* p_avg = &avg;
 
   for(size_t index = 0; index < size; index++)
   {
@@ -288,6 +289,7 @@ static uint16_t adcSampleAverage(uint16_t* array, size_t size)
   }
 
   avg = avg / size;
+  avg = (*p_avg << 8) | *(p_avg + 1);
 
   return (uint16_t)avg;
 }
