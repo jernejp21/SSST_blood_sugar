@@ -44,11 +44,11 @@
 
 #define BT_UUID_SSST_SERVICE_VAL BT_UUID_128_ENCODE(0x0179bbd0, 0x5351, 0x48b5, 0xbf6d, 0x2167639bc867)
 #define BT_UUID_SSST_DATA_VAL BT_UUID_128_ENCODE(0x0179bbd1, 0x5351, 0x48b5, 0xbf6d, 0x2167639bc867)
-#define BT_UUID_SSST_ERROR_VAL BT_UUID_128_ENCODE(0x0179bbd2, 0x5351, 0x48b5, 0xbf6d, 0x2167639bc867)
+#define BT_UUID_SSST_STATUS_VAL BT_UUID_128_ENCODE(0x0179bbd2, 0x5351, 0x48b5, 0xbf6d, 0x2167639bc867)
 
 #define BT_UUID_SSST_SERVICE BT_UUID_DECLARE_128(BT_UUID_SSST_SERVICE_VAL)
 #define BT_UUID_SSST_DATA BT_UUID_DECLARE_128(BT_UUID_SSST_DATA_VAL)
-#define BT_UUID_SSST_ERROR BT_UUID_DECLARE_128(BT_UUID_SSST_ERROR_VAL)
+#define BT_UUID_SSST_STATUS BT_UUID_DECLARE_128(BT_UUID_SSST_STATUS_VAL)
 
 #define BUFFER_SIZE 3
 
@@ -64,7 +64,7 @@ static uint8_t rx_buff[BUFFER_SIZE] __attribute__((aligned(2)));
 static uint8_t tx_buff[BUFFER_SIZE] __attribute__((aligned(2)));
 static uint32_t adcRawDataCnt;
 static uint32_t adcAvgDataCnt;
-static uint8_t errorStatus;
+static uint8_t statusFlags;
 
 /* Kernel variables */
 static uint8_t startShutdnTimer;
@@ -85,14 +85,11 @@ K_SEM_DEFINE(bleSemaphor, 0, 1);
 /* Bluetooth config */
 void BT_Connected(struct bt_conn*, uint8_t);
 void BT_Disconnected(struct bt_conn*, uint8_t);
-ssize_t ssstErrorSend(struct bt_conn*, const struct bt_gatt_attr*, void*, uint16_t, uint16_t);
+ssize_t ssstStatusSend(struct bt_conn*, const struct bt_gatt_attr*, void*, uint16_t, uint16_t);
 void ssst_ccc_cfg_changed(const struct bt_gatt_attr*, uint16_t);
 
 static const struct bt_data advert[] = {
     BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR))};
-
-static const struct bt_data scan[] = {
-    BT_DATA_BYTES(BT_DATA_UUID128_ALL, BT_UUID_SSST_SERVICE_VAL)};
 
 BT_CONN_CB_DEFINE(conn_callbacks) = {
     .connected = BT_Connected,
@@ -106,10 +103,10 @@ BT_GATT_SERVICE_DEFINE(ssst_svc,
                                               BT_GATT_PERM_NONE,
                                               NULL, NULL, NULL),
                        BT_GATT_CCC(ssst_ccc_cfg_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
-                       BT_GATT_CHARACTERISTIC(BT_UUID_SSST_ERROR,
+                       BT_GATT_CHARACTERISTIC(BT_UUID_SSST_STATUS,
                                               BT_GATT_CHRC_READ,
                                               BT_GATT_PERM_READ,
-                                              ssstErrorSend, NULL, NULL), );
+                                              ssstStatusSend, NULL, NULL), );
 
 /* Functions */
 static void ledExtADCSelPattern()
@@ -218,8 +215,9 @@ static void adcSwitchBtn(void* p1, void* p2, void* p3)
         // Switch to external ADC
         SAADC_DisableIntADC();
         ledExtADCSelPattern();
-        SAADC_EnableExtADC();
+        SAADC_EnableExtADC(rx_buff, tx_buff, BUFFER_SIZE);
 
+        statusFlags &= ~(1 << FLAG_SENS_BIT);
         isInternalAdc = 0;
       }
       else
@@ -229,6 +227,7 @@ static void adcSwitchBtn(void* p1, void* p2, void* p3)
         ledIntADCSelPattern();
         SAADC_EnableIntADC();
 
+        statusFlags |= (1 << FLAG_SENS_BIT);
         isInternalAdc = 1;
       }
 
@@ -322,24 +321,22 @@ static void heartBeat(void* p1, void* p2, void* p3)
 
 void BT_Connected(struct bt_conn* conn, uint8_t err)
 {
-  printk("BLE Connected.\n");
 }
 
 void BT_Disconnected(struct bt_conn* conn, uint8_t reason)
 {
-  printk("BLE Disconnected.\n");
   timerStopSampling();
   k_sem_take(&bleSemaphor, K_NO_WAIT);
   resetBufferIndex();
 }
 
-ssize_t ssstErrorSend(struct bt_conn* conn,
-                      const struct bt_gatt_attr* attr,
-                      void* buf,
-                      uint16_t len,
-                      uint16_t offset)
+ssize_t ssstStatusSend(struct bt_conn* conn,
+                       const struct bt_gatt_attr* attr,
+                       void* buf,
+                       uint16_t len,
+                       uint16_t offset)
 {
-  return bt_gatt_attr_read(conn, attr, buf, len, offset, &errorStatus, sizeof(errorStatus));
+  return bt_gatt_attr_read(conn, attr, buf, len, offset, &statusFlags, sizeof(statusFlags));
 }
 
 void ssst_ccc_cfg_changed(const struct bt_gatt_attr* attr, uint16_t value)
@@ -381,11 +378,6 @@ static void BT_SendData(void* p1, void* p2, void* p3)
     else
     {
       error = bt_gatt_notify(NULL, &ssst_svc.attrs[1], adcAvgData1, AVG_DATA_SIZE * sizeof(uint16_t));
-    }
-
-    if(error != 0)
-    {
-      printk("Error sending data.\n");
     }
   }
 }
@@ -477,11 +469,6 @@ static void BT_Init()
   int err;
 
   err = bt_le_adv_start(BT_LE_ADV_CONN_NAME, advert, ARRAY_SIZE(advert), NULL, 0);
-
-  if(err != 0)
-  {
-    printk("Couldn't start advertising. Error: %d\n", err);
-  }
 }
 
 static void adcSamplingIRQ(const void* arg)
@@ -575,6 +562,7 @@ static void checkBattStatus(const void* arg)
   {
     // Low battery
     isLowBattery = 1;
+    statusFlags |= (1 << FLAG_BATT_BIT);
     SAADC_DisableExtADC();
     SAADC_DisableIntADC();
     k_thread_suspend(&thr_adcSwitchBtn);
@@ -585,13 +573,14 @@ static void checkBattStatus(const void* arg)
   {
     // Battery is charging. No more low battery
     isLowBattery = 0;
+    statusFlags &= ~(1 << FLAG_BATT_BIT);
     if(isInternalAdc == 1)
     {
       SAADC_EnableIntADC();
     }
     else
     {
-      SAADC_EnableExtADC();
+      SAADC_EnableExtADC(rx_buff, tx_buff, BUFFER_SIZE);
     }
 
     k_thread_resume(&thr_adcSwitchBtn);
@@ -607,11 +596,11 @@ static void kernelInit()
   int priority;
 
   /* Init threads but don't start them yet. */
-  priority = 6;
+  priority = 5;
   k_thread_create(&thr_ShutDnBtn, stk_ShutDnBtn, K_THREAD_STACK_SIZEOF(stk_ShutDnBtn), shutDnBtn, NULL, NULL, NULL, priority, 0, K_MSEC(3000));
   k_thread_name_set(&thr_ShutDnBtn, "Shutdown button");
 
-  priority = 7;
+  priority = 6;
   k_thread_create(&thr_adcSwitchBtn, stk_adcSwitchBtn, K_THREAD_STACK_SIZEOF(stk_adcSwitchBtn), adcSwitchBtn, NULL, NULL, NULL, priority, 0, K_NO_WAIT);
   k_thread_name_set(&thr_adcSwitchBtn, "ADC switch button");
   k_thread_suspend(&thr_adcSwitchBtn);
@@ -625,15 +614,15 @@ static void kernelInit()
   k_thread_name_set(&thr_blueTooth, "Bluetooth");
 
   /* Init IRQs */
-  priority = 5;
+  priority = -3;
   irq_connect_dynamic(TIMER2_IRQn, priority, adcSamplingIRQ, NULL, 0);
   irq_enable(TIMER2_IRQn);
 
-  priority = 5;
+  priority = -2;
   irq_connect_dynamic(TIMER3_IRQn, priority, adcAvgIRQ, NULL, 0);
   irq_enable(TIMER3_IRQn);
 
-  priority = 5;
+  priority = -4;
   irq_connect_dynamic(LPCOMP_IRQn, priority, checkBattStatus, NULL, 0);
   irq_enable(LPCOMP_IRQn);
 
@@ -690,13 +679,15 @@ static void checkStartupBattery()
   {
     isInternalAdc = 0;
     isLowBattery = 0;
+    statusFlags &= ~(1 << FLAG_BATT_BIT);
     SAADC_DisableIntADC();
-    SAADC_EnableExtADC();
+    SAADC_EnableExtADC(rx_buff, tx_buff, BUFFER_SIZE);
     k_thread_resume(&thr_adcSwitchBtn);
   }
   else
   {
     isLowBattery = 1;
+    statusFlags |= (1 << FLAG_BATT_BIT);
     SAADC_DisableExtADC();
     SAADC_DisableIntADC();
     k_thread_suspend(&thr_adcSwitchBtn);
@@ -730,11 +721,6 @@ void main(void)
 
   /* Start BT advertising */
   err = bt_enable(BT_Init);
-
-  if(err != 0)
-  {
-    printk("Couldn't enable BLE. Error: %d\n", err);
-  }
 
   // main is only for system init. Afterwards everyhing is done in threads.
 }

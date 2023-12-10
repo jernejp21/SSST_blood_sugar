@@ -13,8 +13,20 @@
 		],
 		"C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 2, BreakBeforeBraces: Allman, BraceWrapping: {BeforeWhile: false}, AllowShortLoopsOnASingleLine: true, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 0, SpaceBeforeParens: false, PointerAlignment: Left, AlignTrailingComments: false, SpacesBeforeTrailingComments: 2 }",
 		"files.associations": {
-			"iostream": "c"
-		}
+			"iostream": "c",
+			"array": "c",
+			"string": "c",
+			"string_view": "c",
+			"hci.h": "c",
+			"gatt.h": "c",
+			"conn.h": "c",
+			"uuid.h": "c",
+			"io.h": "c",
+			"pm.h": "c"
+		},
+		"nrf-connect.boardRoots": [
+			"${workspaceFolder}"
+		]
 	}
 	
 }

@@ -34,7 +34,7 @@ uint8_t BTN_ShutdnStatus();
 uint8_t BTN_AdcChgStatus();
 void SAADC_EnableIntADC();
 void SAADC_DisableIntADC();
-void SAADC_EnableExtADC();
+void SAADC_EnableExtADC(uint8_t* rx_buffer, uint8_t* tx_buffer, uint8_t buffer_size);
 void SAADC_DisableExtADC();
 void timerStopSampling();
 void timerStartSampling();
