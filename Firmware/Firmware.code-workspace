@@ -22,7 +22,16 @@
 			"conn.h": "c",
 			"uuid.h": "c",
 			"io.h": "c",
-			"pm.h": "c"
+			"pm.h": "c",
+			"optional": "c",
+			"istream": "c",
+			"ostream": "c",
+			"ratio": "c",
+			"system_error": "c",
+			"functional": "c",
+			"tuple": "c",
+			"type_traits": "c",
+			"utility": "c"
 		},
 		"nrf-connect.boardRoots": [
 			"${workspaceFolder}"

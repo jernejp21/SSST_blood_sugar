@@ -2268,7 +2268,7 @@
        </FixedFNode.1>
       </FNet>
       <Op>
-       <TraceCalibrationPerformed>false</TraceCalibrationPerformed>
+       <TraceCalibrationPerformed>true</TraceCalibrationPerformed>
       </Op>
       <Op_BPs>
        <BPs>
@@ -2972,7 +2972,7 @@
          <CortexSWDClock>6000</CortexSWDClock>
          <CortexSwoClkPrescaler>1</CortexSwoClkPrescaler>
          <CortexSWOClock>32000</CortexSWOClock>
-         <CortexTraceProtocol>SWO</CortexTraceProtocol>
+         <CortexTraceProtocol>Parallel</CortexTraceProtocol>
          <CortexTRACEWidth>4-bit</CortexTRACEWidth>
          <UseCTMCh0and1ForSyncedRunStop>false</UseCTMCh0and1ForSyncedRunStop>
          <UseCTMCh2and3ForTrace>false</UseCTMCh2and3ForTrace>
@@ -3032,9 +3032,9 @@
         <BootCore>0</BootCore>
         <Breakpoints>HW</Breakpoints>
         <CacheSWBPs>false</CacheSWBPs>
-        <CalibrateClockVref>32</CalibrateClockVref>
+        <CalibrateClockVref>0</CalibrateClockVref>
         <CalibratePhase>13</CalibratePhase>
-        <CalibrateVref>116</CalibrateVref>
+        <CalibrateVref>110</CalibrateVref>
         <ClockkHz>1000</ClockkHz>
         <CycleDuration>1e-09</CycleDuration>
         <DebugChannel>JTAG</DebugChannel>
@@ -3082,9 +3082,9 @@
         <Breakpoints>0</Breakpoints>
         <CacheDL>0</CacheDL>
         <CacheSWBPs>0</CacheSWBPs>
-        <CalibrateClockVref>32</CalibrateClockVref>
+        <CalibrateClockVref>0</CalibrateClockVref>
         <CalibratePhase>13</CalibratePhase>
-        <CalibrateVref>116</CalibrateVref>
+        <CalibrateVref>110</CalibrateVref>
         <ClockkHz>1000</ClockkHz>
         <CycleDuration type="D">0.0000000010000000</CycleDuration>
         <DebugClockkHz>4000</DebugClockkHz>
@@ -3367,7 +3367,7 @@
         <IPUseGlobalDiscoveryPort>0</IPUseGlobalDiscoveryPort>
         <Mode>3</Mode>
         <TCPPortNumber>5313</TCPPortNumber>
-        <USBDeviceName></USBDeviceName>
+        <USBDeviceName>iC5000 (SN 131398)</USBDeviceName>
        </Communication>
        <IFX_DAS>
         <Config>
